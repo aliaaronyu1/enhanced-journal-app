@@ -1,2 +1,2 @@
 # enhanced-journal-app
-A personal journaling application for growth
+A guided journaling application for personal reflection and growth

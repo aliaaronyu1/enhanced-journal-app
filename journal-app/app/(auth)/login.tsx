@@ -4,22 +4,22 @@ import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
 import { useRouter } from "expo-router";
 
-export default function RegisterScreen() {
+export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useContext(AuthContext);
   const router = useRouter();
 
-  const handleRegister = async () => {
+  const handleLogin = async () => {
     if (!email || !password) return Alert.alert("Please fill all fields");
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", { email, password });
+      const res = await axios.post("http://localhost:5000/api/auth/login", { email, password });
       login(res.data.user, res.data.token);
-      router.replace("/"); // navigate to home after registration
+      router.replace("/(tabs)"); // navigate to home after login
     } catch (err: any) {
-      Alert.alert(err.response?.data?.msg || "Registration failed");
+      Alert.alert(err.response?.data?.msg || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -27,7 +27,7 @@ export default function RegisterScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Register</Text>
+      <Text style={styles.title}>Login</Text>
       <TextInput
         placeholder="Email"
         value={email}
@@ -43,9 +43,9 @@ export default function RegisterScreen() {
         secureTextEntry
         style={styles.input}
       />
-      <Button title={loading ? "Registering..." : "Register"} onPress={handleRegister} />
-      <Text style={styles.switch} onPress={() => router.push("/auth/login")}>
-        Already have an account? Login
+      <Button title={loading ? "Logging in..." : "Login"} onPress={handleLogin} />
+      <Text style={styles.switch} onPress={() => router.push("/(auth)/register")}>
+        Don't have an account? Register
       </Text>
     </View>
   );

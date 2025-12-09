@@ -3,7 +3,7 @@ import { pool } from "../db";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = "your_jwt_secret_here"; // use env variable
+const JWT_SECRET = process.env.JWT_SECRET as string; // use env variable
 
 export const register = async (req: Request, res: Response) => {
   const { email, password } = req.body;

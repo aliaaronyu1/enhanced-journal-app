@@ -5,14 +5,14 @@ import { AuthContext } from "../context/AuthContext";
 import { View, ActivityIndicator } from "react-native";
 
 export default function RootLayout() {
-  // const { user } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
-  // if (user === undefined) return (
-  //   <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-  //     <ActivityIndicator />
-  //   </View>
-  // );
-
+  if (user === undefined) return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <ActivityIndicator />
+    </View>
+  );
+  
   // if (!user) return <Tabs.Screen name="auth/login" />;
   return (
     <Tabs

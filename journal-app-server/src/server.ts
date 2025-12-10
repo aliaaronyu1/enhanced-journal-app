@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import authRoutes from "./routes/authRoutes";
+import journalRoutes from "./routes/journalRoutes";
 import cors from "cors";
 
 const app = express();
@@ -17,6 +18,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+
+app.use("/journal-entries", journalRoutes)
 
 // Start server
 app.listen(PORT, () => {

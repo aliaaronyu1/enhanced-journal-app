@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 
-app.use("/journal-entries", journalRoutes)
+app.use("/user/:user_id", journalRoutes)
 
 // Start server
 app.listen(PORT, () => {

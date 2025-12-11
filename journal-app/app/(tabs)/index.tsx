@@ -1,13 +1,15 @@
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Button } from "react-native";
 import { AuthContext } from "@/context/AuthContext";
+import { useRouter } from "expo-router";
 
 export default function HomeScreen() {
   const { user } = useContext(AuthContext);
   const [entries, setEntries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const router = useRouter();
+  
   useEffect(() => {
     if (user?.id) {
       fetchUsersEntries(user.id);
@@ -16,13 +18,20 @@ export default function HomeScreen() {
 
   const fetchUsersEntries = async (userId: number) => {
     try {
-      const res = await axios.get(`http://localhost:5000/journal-entries/${userId}`)
+      const res = await axios.get(`http://localhost:5000/user/${userId}`)
       setEntries(res.data);
     } catch (error) {
       console.error("Error fetching entries:", error);
     } finally {
       setLoading(false);
     }
+  }
+
+  const handleUpdateEntry = (entryId: number) => {
+    router.push({
+      pathname: "/edit-entry/[entryId]", // the route file
+      params: { entryId: entryId }, // the dynamic param
+    });
   }
   if (loading) {
     return (
@@ -45,6 +54,7 @@ export default function HomeScreen() {
               <View style={styles.entryContainer}>
                 <Text style={styles.entryTitle}>{item.title}</Text>
                 <Text style={styles.entryBody}>{item.body}</Text>
+                <Button title="Edit" onPress={()=>{ handleUpdateEntry(item.id) }}/>
               </View>
             )}
           />

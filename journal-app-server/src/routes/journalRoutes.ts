@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { getAllJournalsEntriesForUser } from "../controllers/journalController";
+import { getAllJournalEntriesForUser, getJournalEntryById, updateJournalEntryById } from "../controllers/journalController";
 
-const router = Router();
+const router = Router({ mergeParams: true });
 
-router.get("/:user_id", getAllJournalsEntriesForUser);
-
+router.get("/", getAllJournalEntriesForUser);
+router.get("/journal-entry/:entry_id", getJournalEntryById)
+router.put("/journal-entry/:entry_id", updateJournalEntryById)
 export default router;

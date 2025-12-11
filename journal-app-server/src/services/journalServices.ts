@@ -12,7 +12,7 @@ export const getAllJournalsForUser = async (userId: string) => {
   return result.rows;
 };
 
-export const getEntryByEntryId = async (userId: string, entryId: string) => {
+export const getEntryById = async (userId: string, entryId: string) => {
   const result = await pool.query(
     `SELECT * FROM journal_entries 
     WHERE user_id = $1 AND id = $2`,
@@ -30,3 +30,13 @@ export const updateEntryById = async (userId: string, entryId: string, title: st
 
   return result.rows[0];
 }
+
+export const deleteEntryById = async (userId: string, entryId: string) => {
+  const result = await pool.query(
+    `DELETE FROM journal_entries 
+    WHERE user_id = $1 AND id = $2
+    RETURNING *`,
+    [userId, entryId]
+  );
+  return result.rows[0];
+};

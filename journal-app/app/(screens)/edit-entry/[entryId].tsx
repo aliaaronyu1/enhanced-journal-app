@@ -42,7 +42,16 @@ export default function EditEntryScreen() {
       Alert.alert("Error", "Failed to save changes");
     }
   };
+  const handleDelete = async () => {
+    try {
+      console.log(entryId)
+      await axios.delete(`http://localhost:5000/user/${user.id}/journal-entry/${entryId}`);
 
+      router.back(); // go back to HomeScreen
+    } catch (error) {
+      Alert.alert("Error", "Failed to delete entry");
+    }
+  };
   if (loading) return <ActivityIndicator size="large" />;
 
   return (
@@ -61,6 +70,7 @@ export default function EditEntryScreen() {
       />
 
       <Button title="Save" onPress={handleSave} />
+      <Button title="Delete" onPress={handleDelete} />
     </View>
   );
 }

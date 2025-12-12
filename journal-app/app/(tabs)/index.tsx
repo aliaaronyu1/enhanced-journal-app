@@ -33,6 +33,11 @@ export default function HomeScreen() {
       params: { entryId: entryId }, // the dynamic param
     });
   }
+
+  const handleAddEntry = () => {
+    router.push({pathname: "/new-entry"});
+  }
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -47,17 +52,20 @@ export default function HomeScreen() {
         <Text>Recent entries will appear here.</Text>
       ) :
         (
-          <FlatList
-            data={entries}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.entryContainer}>
-                <Text style={styles.entryTitle}>{item.title}</Text>
-                <Text style={styles.entryBody}>{item.body}</Text>
-                <Button title="Edit" onPress={()=>{ handleUpdateEntry(item.id) }}/>
-              </View>
-            )}
-          />
+          <View>
+            <FlatList
+              data={entries}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <View style={styles.entryContainer}>
+                  <Text style={styles.entryTitle}>{item.title}</Text>
+                  <Text style={styles.entryBody}>{item.body}</Text>
+                  <Button title="Edit" onPress={() => { handleUpdateEntry(item.id) }} />
+                </View>
+              )}
+            />
+            <Button title="Add" onPress={handleAddEntry}/>
+          </View>
         )}
 
     </View>

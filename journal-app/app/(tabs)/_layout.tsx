@@ -33,15 +33,6 @@ export default function RootLayout() {
         }}
       />
 
-      <Tabs.Screen
-        name="new-entry/index"
-        options={{
-          title: "New Entry",
-          tabBarIcon: ({ size, color }) => (
-            <Ionicons name="create-outline" size={size} color={color} />
-          ),
-        }}
-      />
 
       <Tabs.Screen
         name="settings/index"

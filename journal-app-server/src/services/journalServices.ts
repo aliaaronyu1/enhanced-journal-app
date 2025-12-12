@@ -20,6 +20,17 @@ export const getEntryById = async (userId: string, entryId: string) => {
   );
   return result.rows[0];
 };
+
+export const createEntry = async (user_id: string, title: string, body: string) => {
+  const result = await pool.query(
+    `INSERT INTO journal_entries (user_id, title, body)
+     VALUES ($1, $2, $3)
+     RETURNING *;`, 
+     [user_id, title, body]
+  )
+  console.log(result)
+  return result.rows[0];
+}
 export const updateEntryById = async (userId: string, entryId: string, title: string, body: string) => {
   const result = await pool.query(
     `UPDATE journal_entries

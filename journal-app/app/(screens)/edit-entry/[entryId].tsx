@@ -31,7 +31,6 @@ export default function EditEntryScreen() {
 
   const handleSave = async () => {
     try {
-      console.log(entryId)
       await axios.put(`http://localhost:5000/user/${user.id}/journal-entry/${entryId}`, {
         title,
         body,
@@ -44,7 +43,6 @@ export default function EditEntryScreen() {
   };
   const handleDelete = async () => {
     try {
-      console.log(entryId)
       await axios.delete(`http://localhost:5000/user/${user.id}/journal-entry/${entryId}`);
 
       router.back(); // go back to HomeScreen

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getAllJournalsForUser, getEntryById, updateEntryById, deleteEntryById } from "../services/journalServices";
+import { getAllJournalsForUser, getEntryById, updateEntryById, deleteEntryById, createEntry } from "../services/journalServices";
 
 export const getAllJournalEntriesForUser = async (req: Request, res: Response) => {
     const { user_id } = req.params;
@@ -32,6 +32,21 @@ export const getJournalEntryById = async (req: Request, res: Response) => {
     }
 }
 
+export const CreateJournalEntry = async (req: Request, res: Response) => {
+    const { user_id } = req.params;
+    const { title, body } = req.body;
+    if (!user_id || !title || !body) return res.status(400).json({ msg: "malformed data" });
+
+    try {
+        const createdEntry = await createEntry(user_id, title, body);
+
+        res.status(200).json(createdEntry);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: "Server error while creating journal entry for user" });
+    }
+}
+
 export const updateJournalEntryById = async (req: Request, res: Response) => {
     const { user_id, entry_id } = req.params;
     const { title, body } = req.body;
@@ -43,7 +58,7 @@ export const updateJournalEntryById = async (req: Request, res: Response) => {
         res.status(200).json(entry); 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ msg: "Server error while updatiing journal entry for user" });
+        res.status(500).json({ msg: "Server error while updating journal entry for user" });
     }
 }
 

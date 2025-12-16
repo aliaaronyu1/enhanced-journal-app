@@ -55,7 +55,7 @@ export default function EditEntryScreen() {
   return (
     <View style={styles.container}>
       <TextInput
-        style={styles.input}
+        style={styles.titleInput}
         value={title}
         onChangeText={setTitle}
       />
@@ -75,11 +75,16 @@ export default function EditEntryScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 24 },
+  titleInput: {
+    backgroundColor: "#f3f3f3",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
   input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,
+    flex: 1
   },
 });

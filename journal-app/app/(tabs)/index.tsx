@@ -49,11 +49,15 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Your Journal</Text>
       {entries.length === 0 ? (
-        <Text>Recent entries will appear here.</Text>
+        <View>
+          <Text>Recent entries will appear here.</Text>
+          <Button title="Add" onPress={handleAddEntry} />
+        </View>
       ) :
         (
           <View>
             <FlatList
+              style={styles.list}
               data={entries}
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => (
@@ -77,6 +81,10 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 24,
     justifyContent: "center",
+  },
+  list: {
+    height: 600,
+    overflow: "scroll"
   },
   title: {
     fontSize: 32,

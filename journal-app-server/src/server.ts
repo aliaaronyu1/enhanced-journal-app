@@ -3,6 +3,7 @@ dotenv.config();
 import express from "express";
 import authRoutes from "./routes/authRoutes";
 import journalRoutes from "./routes/journalRoutes";
+import gptRoutes from "./routes/gptRoutes";
 import cors from "cors";
 
 const app = express();
@@ -20,7 +21,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 
 app.use("/user/:user_id", journalRoutes)
-
+app.use("/openai", gptRoutes)
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

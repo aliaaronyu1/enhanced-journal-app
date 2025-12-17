@@ -19,18 +19,35 @@ export default function HomeScreen() {
     }
   }, [user]);
 
-  const formatDate = (dateString: string) => {
+  const formatEntryTime = (dateString: string) => {
+    const now = new Date();
     const date = new Date(dateString);
+    const diffMs = now.getTime() - date.getTime();
 
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }) + " • " + date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-    });
+    const seconds = Math.floor(diffMs / 1000);
+    const minutes = Math.floor(diffMs / 60_000);
+    const hours = Math.floor(diffMs / 3_600_000);
+    const days = Math.floor(diffMs / 86_400_000);
+
+    if (days >= 3) {
+      // Older than 3 days → show full date
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }) + " • " + date.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+      });
+    }
+
+    if (days > 0) return `${days} day${days > 1 ? "s" : ""} ago`;
+    if (hours > 0) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    if (minutes > 0) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    return `Just now`;
   };
+
+
 
   const fetchUsersEntries = async (userId: number) => {
     try {
@@ -39,7 +56,7 @@ export default function HomeScreen() {
       // Map over entries and add formattedDate property
       const formattedEntries = res.data.map((entry: any) => ({
         ...entry,
-        formattedDate: formatDate(entry.created_at),
+        formattedDate: formatEntryTime(entry.created_at),
       }));
       
       setEntries(formattedEntries)

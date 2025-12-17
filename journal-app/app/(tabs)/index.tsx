@@ -1,25 +1,48 @@
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, Button } from "react-native";
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Button, TouchableOpacity } from "react-native";
 import { AuthContext } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+
+
 
 export default function HomeScreen() {
   const { user } = useContext(AuthContext);
   const [entries, setEntries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  
+
   useEffect(() => {
     if (user?.id) {
       fetchUsersEntries(user.id);
     }
   }, [user]);
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }) + " • " + date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  };
+
   const fetchUsersEntries = async (userId: number) => {
     try {
       const res = await axios.get(`http://localhost:5000/user/${userId}`)
-      setEntries(res.data);
+      
+      // Map over entries and add formattedDate property
+      const formattedEntries = res.data.map((entry: any) => ({
+        ...entry,
+        formattedDate: formatDate(entry.created_at),
+      }));
+      
+      setEntries(formattedEntries)
     } catch (error) {
       console.error("Error fetching entries:", error);
     } finally {
@@ -55,20 +78,29 @@ export default function HomeScreen() {
         </View>
       ) :
         (
-          <View>
+          <View style={styles.content}>
             <FlatList
-              style={styles.list}
               data={entries}
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => (
-                <View style={styles.entryContainer}>
-                  <Text style={styles.entryTitle}>{item.title}</Text>
-                  <Text style={styles.entryBody}>{item.body}</Text>
-                  <Button title="Edit" onPress={() => { handleUpdateEntry(item.id) }} />
-                </View>
+                <TouchableOpacity style={styles.entryContainer} onPress={() => { handleUpdateEntry(item.id) }}>
+                  <View style={styles.entryHeader}>
+                    <Text style={styles.entryTitle} numberOfLines={1}>{item.title}</Text>
+                    <Text style={styles.entryDate}>{item.formattedDate}</Text>
+                  </View>
+                  <View style={styles.divider} />
+                  <Text style={styles.entryBody} numberOfLines={3}>{item.body}</Text>
+                </TouchableOpacity>
               )}
             />
-            <Button title="Add" onPress={handleAddEntry}/>
+            <View>
+              <TouchableOpacity
+                style={styles.fab}
+                onPress={handleAddEntry}
+                activeOpacity={0.8}>
+                  <Ionicons name="add" size={32} color="#fff" />
+              </TouchableOpacity>
+            </View>
           </View>
         )}
 
@@ -80,11 +112,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24,
-    justifyContent: "center",
   },
-  list: {
-    height: 600,
-    overflow: "scroll"
+  content: {
+    flex: 1,
   },
   title: {
     fontSize: 32,
@@ -96,13 +126,48 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     backgroundColor: "#f0f0f0",
     borderRadius: 8,
+    borderWidth: 1,
+  },
+  entryHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  entryDate: {
+    fontSize: 12,
+    color: "#6b7280",
+    marginLeft: 8,
   },
   entryTitle: {
     fontSize: 20,
     fontWeight: "bold",
   },
+  divider: {
+    height: 1,
+    backgroundColor: "#e5e7eb",
+    marginVertical: 8,
+  },
   entryBody: {
     fontSize: 16,
-    marginTop: 4,
+    // marginTop: 4,
+    color: "#374151",
+  },
+  fab: {
+    position: "absolute",
+    right: 24,
+    bottom: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#2563eb",
+    justifyContent: "center",
+    alignItems: "center",
+
+    // subtle shadow
+    elevation: 6, // Android
+    shadowColor: "#000", // iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
 });

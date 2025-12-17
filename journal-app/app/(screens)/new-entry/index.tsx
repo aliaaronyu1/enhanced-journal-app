@@ -1,8 +1,9 @@
-import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import { useContext, useState } from "react";
 import axios from "axios";
 import { useRouter } from "expo-router";
 import { AuthContext } from "@/context/AuthContext";
+import { API_URL } from "@/lib/api";
 
 export default function NewEntryScreen() {
   const { user } = useContext(AuthContext);
@@ -12,7 +13,7 @@ export default function NewEntryScreen() {
   
   const handleCreateEntry = async () => {
     try {
-      await axios.post(`http://localhost:5000/user/${user.id}`, {
+      await axios.post(`${API_URL}/user/${user.id}`, {
         title,
         body,
       });
@@ -21,10 +22,13 @@ export default function NewEntryScreen() {
     } catch (error) {
       Alert.alert("Error", "Failed to save changes");
     }
-  } 
+  }
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity onPress={() => router.back()}>
+        <Text style={{ fontSize: 16, color: "#007AFF" }}>← Back</Text>
+      </TouchableOpacity>
       <Text style={styles.title}>New Journal Entry</Text>
       <TextInput
         style={styles.titleInput}
@@ -56,7 +60,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   titleInput: {
-    backgroundColor: "#f3f3f3",
     padding: 12,
     borderRadius: 8,
     marginBottom: 20,

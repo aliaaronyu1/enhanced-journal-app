@@ -3,6 +3,7 @@ import { useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
 import { useRouter } from "expo-router";
+import { API_URL } from "@/lib/api";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -15,7 +16,7 @@ export default function LoginScreen() {
     if (!email || !password) return Alert.alert("Please fill all fields");
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", { email, password });
+      const res = await axios.post(`${API_URL}/api/auth/login`, { email, password });
       login(res.data.user, res.data.token);
       router.replace("/(tabs)"); // navigate to home after login
     } catch (err: any) {

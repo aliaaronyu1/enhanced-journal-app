@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, FlatList, ActivityIndicator, Button, TouchableO
 import { AuthContext } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { API_URL } from "@/lib/api";
 
 
 
@@ -47,11 +48,9 @@ export default function HomeScreen() {
     return `Just now`;
   };
 
-
-
   const fetchUsersEntries = async (userId: number) => {
     try {
-      const res = await axios.get(`http://localhost:5000/user/${userId}`)
+      const res = await axios.get(`${API_URL}/user/${userId}`)
       
       // Map over entries and add formattedDate property
       const formattedEntries = res.data.map((entry: any) => ({
@@ -91,7 +90,14 @@ export default function HomeScreen() {
       {entries.length === 0 ? (
         <View>
           <Text>Recent entries will appear here.</Text>
-          <Button title="Add" onPress={handleAddEntry} />
+          <View>
+            <TouchableOpacity
+              style={styles.fab}
+              onPress={handleAddEntry}
+              activeOpacity={0.8}>
+              <Ionicons name="add" size={32} color="#fff" />
+            </TouchableOpacity>
+          </View>
         </View>
       ) :
         (

@@ -81,7 +81,7 @@ export default function EditEntryScreen() {
   };
 
   const handleBack = async () => {
-    if (!title && !body) {
+    if (!title.trim() && !body.trim()) {
       await handleDelete();
     }
     router.back();

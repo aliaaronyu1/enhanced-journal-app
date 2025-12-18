@@ -67,7 +67,7 @@ export default function NewEntryScreen() {
   };
 
   const handleBack = async () => {
-    if (!title && !body && entryIdRef.current) {
+    if (entryIdRef.current && (!title.trim() && !body.trim())) {
       await handleDelete();
     }
     router.back();
@@ -139,6 +139,9 @@ export default function NewEntryScreen() {
               </View>
             </TouchableOpacity>
           </Modal>
+          <Text style={{ fontSize: 12, color: "#888" }}>
+            {saving ? "Saving..." : "All changes saved"}
+          </Text>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

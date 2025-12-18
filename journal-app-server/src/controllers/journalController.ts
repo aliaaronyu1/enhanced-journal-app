@@ -35,7 +35,8 @@ export const getJournalEntryById = async (req: Request, res: Response) => {
 export const CreateJournalEntry = async (req: Request, res: Response) => {
     const { user_id } = req.params;
     const { title, body } = req.body;
-    if (!user_id || !title || !body) return res.status(400).json({ msg: "malformed data" });
+    if (!user_id) return res.status(400).json({ msg: "missing user id" });
+    if (!title && !body) return res.status(400).json({ msg: "Missing title and body" });
 
     try {
         const createdEntry = await createEntry(user_id, title, body);
@@ -50,8 +51,9 @@ export const CreateJournalEntry = async (req: Request, res: Response) => {
 export const updateJournalEntryById = async (req: Request, res: Response) => {
     const { user_id, entry_id } = req.params;
     const { title, body } = req.body;
-    if (!user_id || !entry_id || !title || !body) return res.status(400).json({ msg: "malformed data" });
-
+    if (!user_id || !entry_id) return res.status(400).json({ msg: "missing user or entry id" });
+    if (!title && !body) return res.status(400).json({ msg: "Missing title and body" });
+    
     try {
         const entry = await updateEntryById(user_id, entry_id, title, body);
 

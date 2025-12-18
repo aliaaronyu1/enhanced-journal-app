@@ -13,7 +13,7 @@ export default function NewEntryScreen() {
   const [ body, setBody ] = useState("");
   const [menuVisible, setMenuVisible] = useState(false);
   const entryIdRef = useRef<number | null>(null);
-  const saveTimeout = useRef<number | null>(null);
+  const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const savingRequestRef = useRef<Promise<void> | null>(null);
   const router = useRouter();
 
@@ -117,9 +117,9 @@ export default function NewEntryScreen() {
           <View style={styles.menu}>
             <TouchableOpacity
               style={styles.menuItem}
-              onPress={() => {
+              onPress={async() => {
                 setMenuVisible(false);
-                handleDelete();
+                await handleDelete();
                 router.back();
               }}
             >
@@ -151,8 +151,9 @@ const styles = StyleSheet.create({
   },
   titleInput: {
     padding: 12,
+    fontSize: 20,
+    fontWeight: "bold",
     borderRadius: 8,
-    marginBottom: 20,
   },
   input: {
     padding: 12,

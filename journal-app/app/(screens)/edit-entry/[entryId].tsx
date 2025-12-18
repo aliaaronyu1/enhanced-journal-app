@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState, useEffect, useContext } from "react";
-import { View, TextInput, Button, StyleSheet, Alert, ActivityIndicator, Text, TouchableOpacity, Modal } from "react-native";
+import { View, TextInput, Button, StyleSheet, Alert, ActivityIndicator, Text, TouchableOpacity, Modal, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import axios from "axios";
 import { AuthContext } from "@/context/AuthContext";
 import { useRef } from "react";
@@ -10,7 +10,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 export default function EditEntryScreen() {
   const { user } = useContext(AuthContext);
   const { entryId } = useLocalSearchParams(); // entry ID from route
-  const [ saving, setSaving ] = useState(false);
+  const [saving, setSaving] = useState(false);
   const router = useRouter();
 
   const [menuVisible, setMenuVisible] = useState(false);
@@ -62,7 +62,7 @@ export default function EditEntryScreen() {
       }
 
       if (savingRequestRef.current) {
-        await savingRequestRef.current.catch(()=> {})
+        await savingRequestRef.current.catch(() => { })
       }
 
       savingRequestRef.current = save();
@@ -81,7 +81,7 @@ export default function EditEntryScreen() {
   };
 
   const handleBack = async () => {
-    if(!title && !body) {
+    if (!title && !body) {
       await handleDelete();
     }
     router.back();
@@ -89,62 +89,74 @@ export default function EditEntryScreen() {
   if (loading) return <ActivityIndicator size="large" />;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Text style={{ fontSize: 16, color: "#007AFF" }}>← Back</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setMenuVisible(true)}>
-          <MaterialIcons name="more-vert" size={28} color="black" />
-        </TouchableOpacity>
-      </View>
-      <TextInput
-        style={styles.titleInput}
-        value={title}
-        onChangeText={(text) => {
-          setTitle(text);
-          autoSave(text, body);
-        }}
-      />
-
-      <TextInput
-        style={[styles.input, { height: 150 }]}
-        value={body}
-        onChangeText={(text) => {
-          setBody(text);
-          autoSave(title, text);
-        }}
-        multiline
-      />
-      <Modal
-        visible={menuVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setMenuVisible(false)}
-      >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          onPress={() => setMenuVisible(false)}
-        >
-          <View style={styles.menu}>
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={async() => {
-                setMenuVisible(false);
-                await handleDelete();
-                router.back();
-              }}
-            >
-              <MaterialIcons name="delete" size={20} color="red" />
-              <Text style={[styles.menuText, { color: "red" }]}>Delete</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={0}
+    >
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="interactive">
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={handleBack}>
+              <Text style={{ fontSize: 16, color: "#007AFF" }}>← Back</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setMenuVisible(true)}>
+              <MaterialIcons name="more-vert" size={28} color="black" />
             </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-      </Modal>
-      <Text style={{ fontSize: 12, color: "#888" }}>
-        {saving ? "Saving..." : "All changes saved"}
-      </Text>
-    </View>
+          <TextInput
+            style={styles.titleInput}
+            value={title}
+            onChangeText={(text) => {
+              setTitle(text);
+              autoSave(text, body);
+            }}
+          />
+
+          <TextInput
+            style={[styles.input]}
+            value={body}
+            onChangeText={(text) => {
+              setBody(text);
+              autoSave(title, text);
+            }}
+            multiline
+            scrollEnabled={false}
+          />
+          <Modal
+            visible={menuVisible}
+            transparent
+            animationType="fade"
+            onRequestClose={() => setMenuVisible(false)}
+          >
+            <TouchableOpacity
+              style={styles.modalOverlay}
+              onPress={() => setMenuVisible(false)}
+            >
+              <View style={styles.menu}>
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={async () => {
+                    setMenuVisible(false);
+                    await handleDelete();
+                    router.back();
+                  }}
+                >
+                  <MaterialIcons name="delete" size={20} color="red" />
+                  <Text style={[styles.menuText, { color: "red" }]}>Delete</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          </Modal>
+          <Text style={{ fontSize: 12, color: "#888" }}>
+            {saving ? "Saving..." : "All changes saved"}
+          </Text>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -160,13 +172,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,
-    flex: 1
+    minHeight: 200
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
   },
   modalOverlay: {
     flex: 1,

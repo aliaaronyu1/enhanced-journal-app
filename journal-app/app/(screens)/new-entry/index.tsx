@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity, Modal } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity, Modal, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { useContext, useState, useRef } from "react";
 import axios from "axios";
 import { useRouter } from "expo-router";
@@ -9,8 +9,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 export default function NewEntryScreen() {
   const { user } = useContext(AuthContext);
   const [title, setTitle] = useState("");
-  const [ saving, setSaving ] = useState(false);
-  const [ body, setBody ] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [body, setBody] = useState("");
   const [menuVisible, setMenuVisible] = useState(false);
   const entryIdRef = useRef<number | null>(null);
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -47,7 +47,7 @@ export default function NewEntryScreen() {
 
       //if a previous state is running, wait for it to finish to avoid race conditions
       if (savingRequestRef.current) {
-        await savingRequestRef.current.catch(() => {});//ignore previous errors
+        await savingRequestRef.current.catch(() => { });//ignore previous errors
       }
 
       //track this save request
@@ -67,69 +67,81 @@ export default function NewEntryScreen() {
   };
 
   const handleBack = async () => {
-    if(!title && !body && entryIdRef.current) {
+    if (!title && !body && entryIdRef.current) {
       await handleDelete();
     }
     router.back();
   }
   return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={handleBack}>
-        <Text style={{ fontSize: 16, color: "#007AFF" }}>← Back</Text>
-      </TouchableOpacity>
-      <View style={styles.header}>
-        <Text style={styles.title}>New Journal Entry</Text>
-        <TouchableOpacity onPress={() => setMenuVisible(true)}>
-          <MaterialIcons name="more-vert" size={28} color="black" />
-        </TouchableOpacity>
-      </View>
-      
-      <TextInput
-        style={styles.titleInput}
-        placeholder="Title..."
-        value={title}
-        onChangeText={(text) => {
-          autoSave(text, body)
-          setTitle(text)
-        }}
-      />
-      <TextInput
-        style={styles.input}
-        multiline
-        placeholder="Write your thoughts..."
-        value={body}
-        onChangeText={(text) => {
-          autoSave(title, text)
-          setBody(text)
-        }}
-      />
-      {/* Delete modal */}
-      <Modal
-        visible={menuVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setMenuVisible(false)}
-      >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          onPress={() => setMenuVisible(false)}
-        >
-          <View style={styles.menu}>
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={async() => {
-                setMenuVisible(false);
-                await handleDelete();
-                router.back();
-              }}
-            >
-              <MaterialIcons name="delete" size={20} color="red" />
-              <Text style={[styles.menuText, { color: "red" }]}>Delete</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={0}
+    >
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="interactive">
+        <View style={styles.container}>
+          <TouchableOpacity onPress={handleBack}>
+            <Text style={{ fontSize: 16, color: "#007AFF" }}>← Back</Text>
+          </TouchableOpacity>
+          <View style={styles.header}>
+            <Text style={styles.title}>New Journal Entry</Text>
+            <TouchableOpacity onPress={() => setMenuVisible(true)}>
+              <MaterialIcons name="more-vert" size={28} color="black" />
             </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-      </Modal>
-    </View>
+
+          <TextInput
+            style={styles.titleInput}
+            placeholder="Title..."
+            value={title}
+            onChangeText={(text) => {
+              autoSave(text, body)
+              setTitle(text)
+            }}
+          />
+          <TextInput
+            style={styles.input}
+            multiline
+            scrollEnabled={false}
+            placeholder="Write your thoughts..."
+            value={body}
+            onChangeText={(text) => {
+              autoSave(title, text)
+              setBody(text)
+            }}
+          />
+          {/* Delete modal */}
+          <Modal
+            visible={menuVisible}
+            transparent
+            animationType="fade"
+            onRequestClose={() => setMenuVisible(false)}
+          >
+            <TouchableOpacity
+              style={styles.modalOverlay}
+              onPress={() => setMenuVisible(false)}
+            >
+              <View style={styles.menu}>
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={async () => {
+                    setMenuVisible(false);
+                    await handleDelete();
+                    router.back();
+                  }}
+                >
+                  <MaterialIcons name="delete" size={20} color="red" />
+                  <Text style={[styles.menuText, { color: "red" }]}>Delete</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          </Modal>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -142,12 +154,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 12,
   },
   titleInput: {
     padding: 12,
@@ -159,7 +169,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     marginBottom: 20,
-    flex: 1
+    minHeight: 200
   },
   modalOverlay: {
     flex: 1,

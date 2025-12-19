@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Alert } from "react-native";
 import { AuthContext } from "../../../context/AuthContext";
 import { useContext, useState } from "react";
 import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SettingsScreen() {
   const { user, logout } = useContext(AuthContext);
@@ -23,9 +24,11 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Settings</Text>
+      <SafeAreaView edges={['top']}>
+        <Text style={styles.title}>Settings</Text>
+      </SafeAreaView>
       <Text>Preferences, app theme, and account options will go here.</Text>
-      <Button title={loading ? "Logging out..." : "Logout"} disabled={loading} onPress={handleLogout}/>
+      <Button title={loading ? "Logging out..." : "Logout"} disabled={loading} onPress={handleLogout} />
     </View>
   );
 }

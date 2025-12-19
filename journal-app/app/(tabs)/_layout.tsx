@@ -9,10 +9,10 @@ export default function RootLayout() {
 
   if (user === undefined) return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <ActivityIndicator />
+      <ActivityIndicator size="large" color="#0000ff" />
     </View>
   );
-  
+
   // If not logged in redirect to login screen
   if (!user) {
     return <Redirect href="/(auth)/login" />;
@@ -20,7 +20,7 @@ export default function RootLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerShown: false,
+        headerShown: false
       }}
     >
       <Tabs.Screen

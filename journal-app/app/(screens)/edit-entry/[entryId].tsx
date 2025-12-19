@@ -87,8 +87,13 @@ export default function EditEntryScreen() {
     }
     router.back();
   }
-  if (loading) return <ActivityIndicator size="large" />;
-
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    )
+  }
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -100,8 +105,7 @@ export default function EditEntryScreen() {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="interactive">
         <View style={styles.container}>
-          {/* <SafeAreaView style={{ flex: 1 }}> */}
-
+          <SafeAreaView edges={['top']}>
             <View style={styles.header}>
               <TouchableOpacity onPress={handleBack}>
                 <Text style={{ fontSize: 16, color: "#007AFF" }}>← Back</Text>
@@ -110,54 +114,55 @@ export default function EditEntryScreen() {
                 <MaterialIcons name="more-vert" size={28} color="black" />
               </TouchableOpacity>
             </View>
-            <TextInput
-              style={styles.titleInput}
-              value={title}
-              onChangeText={(text) => {
-                setTitle(text);
-                autoSave(text, body);
-              }}
-            />
+          </SafeAreaView>
 
-            <TextInput
-              style={[styles.input]}
-              value={body}
-              onChangeText={(text) => {
-                setBody(text);
-                autoSave(title, text);
-              }}
-              multiline
-              scrollEnabled={false}
-            />
-            <Modal
-              visible={menuVisible}
-              transparent
-              animationType="fade"
-              onRequestClose={() => setMenuVisible(false)}
+          <TextInput
+            style={styles.titleInput}
+            value={title}
+            onChangeText={(text) => {
+              setTitle(text);
+              autoSave(text, body);
+            }}
+          />
+
+          <TextInput
+            style={[styles.input]}
+            value={body}
+            onChangeText={(text) => {
+              setBody(text);
+              autoSave(title, text);
+            }}
+            multiline
+            scrollEnabled={false}
+          />
+          <Modal
+            visible={menuVisible}
+            transparent
+            animationType="fade"
+            onRequestClose={() => setMenuVisible(false)}
+          >
+            <TouchableOpacity
+              style={styles.modalOverlay}
+              onPress={() => setMenuVisible(false)}
             >
-              <TouchableOpacity
-                style={styles.modalOverlay}
-                onPress={() => setMenuVisible(false)}
-              >
-                <View style={styles.menu}>
-                  <TouchableOpacity
-                    style={styles.menuItem}
-                    onPress={async () => {
-                      setMenuVisible(false);
-                      await handleDelete();
-                      router.back();
-                    }}
-                  >
-                    <MaterialIcons name="delete" size={20} color="red" />
-                    <Text style={[styles.menuText, { color: "red" }]}>Delete</Text>
-                  </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            </Modal>
-            <Text style={{ fontSize: 12, color: "#888" }}>
-              {saving ? "Saving..." : "All changes saved"}
-            </Text>
-          {/* </SafeAreaView> */}
+              <View style={styles.menu}>
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={async () => {
+                    setMenuVisible(false);
+                    await handleDelete();
+                    router.back();
+                  }}
+                >
+                  <MaterialIcons name="delete" size={20} color="red" />
+                  <Text style={[styles.menuText, { color: "red" }]}>Delete</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          </Modal>
+          <Text style={{ fontSize: 12, color: "#888" }}>
+            {saving ? "Saving..." : "All changes saved"}
+          </Text>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

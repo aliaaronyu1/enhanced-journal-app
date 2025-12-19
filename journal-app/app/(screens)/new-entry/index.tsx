@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { AuthContext } from "@/context/AuthContext";
 import { API_URL } from "@/lib/api";
 import { MaterialIcons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function NewEntryScreen() {
   const { user } = useContext(AuthContext);
@@ -83,9 +84,13 @@ export default function NewEntryScreen() {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="interactive">
         <View style={styles.container}>
-          <TouchableOpacity onPress={handleBack}>
-            <Text style={{ fontSize: 16, color: "#007AFF" }}>← Back</Text>
-          </TouchableOpacity>
+          <SafeAreaView edges={['top']}>
+
+            <TouchableOpacity onPress={handleBack}>
+              <Text style={{ fontSize: 16, color: "#007AFF" }}>← Back</Text>
+            </TouchableOpacity>
+          </SafeAreaView>
+
           <View style={styles.header}>
             <Text style={styles.title}>New Journal Entry</Text>
             <TouchableOpacity onPress={() => setMenuVisible(true)}>

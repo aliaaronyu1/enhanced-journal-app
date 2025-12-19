@@ -80,7 +80,7 @@ export default function HomeScreen() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color="#0000ff" />
       </View>
     );
@@ -88,7 +88,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       {/* <SafeAreaView style={{flex: 1}}> */}
-      <SafeAreaView style={{flex: 0}}>
+      <SafeAreaView edges={['top']}>
 
         <Text style={styles.title}>Your Journal</Text>
       </SafeAreaView>
@@ -140,8 +140,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingLeft: 24,
-    paddingRight: 24,
+    paddingHorizontal: 24,
   },
   content: {
     flex: 1,

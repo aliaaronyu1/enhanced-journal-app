@@ -5,6 +5,7 @@ import { AuthContext } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { API_URL } from "@/lib/api";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 
@@ -51,13 +52,13 @@ export default function HomeScreen() {
   const fetchUsersEntries = async (userId: number) => {
     try {
       const res = await axios.get(`${API_URL}/user/${userId}`)
-      
+
       // Map over entries and add formattedDate property
       const formattedEntries = res.data.map((entry: any) => ({
         ...entry,
         formattedDate: formatEntryTime(entry.created_at),
       }));
-      
+
       setEntries(formattedEntries)
     } catch (error) {
       console.error("Error fetching entries:", error);
@@ -74,7 +75,7 @@ export default function HomeScreen() {
   }
 
   const handleAddEntry = () => {
-    router.push({pathname: "/new-entry"});
+    router.push({ pathname: "/new-entry" });
   }
 
   if (loading) {
@@ -86,7 +87,11 @@ export default function HomeScreen() {
   }
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Your Journal</Text>
+      {/* <SafeAreaView style={{flex: 1}}> */}
+      <SafeAreaView style={{flex: 0}}>
+
+        <Text style={styles.title}>Your Journal</Text>
+      </SafeAreaView>
       {entries.length === 0 ? (
         <View>
           <Text>Recent entries will appear here.</Text>
@@ -121,11 +126,12 @@ export default function HomeScreen() {
                 style={styles.fab}
                 onPress={handleAddEntry}
                 activeOpacity={0.8}>
-                  <Ionicons name="add" size={32} color="#fff" />
+                <Ionicons name="add" size={32} color="#fff" />
               </TouchableOpacity>
             </View>
           </View>
         )}
+      {/* </SafeAreaView> */}
 
     </View>
   );
@@ -134,7 +140,8 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
+    paddingLeft: 24,
+    paddingRight: 24,
   },
   content: {
     flex: 1,
@@ -142,7 +149,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    marginBottom: 12,
+    // marginBottom: 12,
   },
   entryContainer: {
     padding: 12,

@@ -6,6 +6,7 @@ import { AuthContext } from "@/context/AuthContext";
 import { useRef } from "react";
 import { API_URL } from "@/lib/api";
 import { MaterialIcons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EditEntryScreen() {
   const { user } = useContext(AuthContext);
@@ -99,61 +100,64 @@ export default function EditEntryScreen() {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="interactive">
         <View style={styles.container}>
-          <View style={styles.header}>
-            <TouchableOpacity onPress={handleBack}>
-              <Text style={{ fontSize: 16, color: "#007AFF" }}>← Back</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setMenuVisible(true)}>
-              <MaterialIcons name="more-vert" size={28} color="black" />
-            </TouchableOpacity>
-          </View>
-          <TextInput
-            style={styles.titleInput}
-            value={title}
-            onChangeText={(text) => {
-              setTitle(text);
-              autoSave(text, body);
-            }}
-          />
+          {/* <SafeAreaView style={{ flex: 1 }}> */}
 
-          <TextInput
-            style={[styles.input]}
-            value={body}
-            onChangeText={(text) => {
-              setBody(text);
-              autoSave(title, text);
-            }}
-            multiline
-            scrollEnabled={false}
-          />
-          <Modal
-            visible={menuVisible}
-            transparent
-            animationType="fade"
-            onRequestClose={() => setMenuVisible(false)}
-          >
-            <TouchableOpacity
-              style={styles.modalOverlay}
-              onPress={() => setMenuVisible(false)}
+            <View style={styles.header}>
+              <TouchableOpacity onPress={handleBack}>
+                <Text style={{ fontSize: 16, color: "#007AFF" }}>← Back</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setMenuVisible(true)}>
+                <MaterialIcons name="more-vert" size={28} color="black" />
+              </TouchableOpacity>
+            </View>
+            <TextInput
+              style={styles.titleInput}
+              value={title}
+              onChangeText={(text) => {
+                setTitle(text);
+                autoSave(text, body);
+              }}
+            />
+
+            <TextInput
+              style={[styles.input]}
+              value={body}
+              onChangeText={(text) => {
+                setBody(text);
+                autoSave(title, text);
+              }}
+              multiline
+              scrollEnabled={false}
+            />
+            <Modal
+              visible={menuVisible}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setMenuVisible(false)}
             >
-              <View style={styles.menu}>
-                <TouchableOpacity
-                  style={styles.menuItem}
-                  onPress={async () => {
-                    setMenuVisible(false);
-                    await handleDelete();
-                    router.back();
-                  }}
-                >
-                  <MaterialIcons name="delete" size={20} color="red" />
-                  <Text style={[styles.menuText, { color: "red" }]}>Delete</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
-          </Modal>
-          <Text style={{ fontSize: 12, color: "#888" }}>
-            {saving ? "Saving..." : "All changes saved"}
-          </Text>
+              <TouchableOpacity
+                style={styles.modalOverlay}
+                onPress={() => setMenuVisible(false)}
+              >
+                <View style={styles.menu}>
+                  <TouchableOpacity
+                    style={styles.menuItem}
+                    onPress={async () => {
+                      setMenuVisible(false);
+                      await handleDelete();
+                      router.back();
+                    }}
+                  >
+                    <MaterialIcons name="delete" size={20} color="red" />
+                    <Text style={[styles.menuText, { color: "red" }]}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableOpacity>
+            </Modal>
+            <Text style={{ fontSize: 12, color: "#888" }}>
+              {saving ? "Saving..." : "All changes saved"}
+            </Text>
+          {/* </SafeAreaView> */}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

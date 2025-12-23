@@ -28,7 +28,7 @@ export const createEntry = async (user_id: string, title: string, body: string) 
      RETURNING *;`, 
      [user_id, title, body]
   )
-  console.log(result)
+  
   return result.rows[0];
 }
 export const updateEntryById = async (userId: string, entryId: string, title: string, body: string) => {

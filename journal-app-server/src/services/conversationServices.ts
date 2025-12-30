@@ -28,3 +28,14 @@ export const createMessageService = async (role: string, content: string, conver
     )
     return result.rows[0];
 }
+
+export const getMessageHistoryService = async (conversation_id: string) => {
+    const result = await pool.query(
+        `
+        SELECT * FROM journal_ai_messages
+        WHERE conversation_id = $1
+        `, [conversation_id]
+    )
+
+    return result.rows;
+}

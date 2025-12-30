@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { openai, SYSTEM_PROMPT } from "../lib/openai"
-import { createMessageService, getOrCreateConversationService } from "../services/conversationServices";
+import { createMessageService, getMessageHistoryService, getOrCreateConversationService } from "../services/conversationServices";
+import { getEntryById } from "../services/journalServices";
 
 export const callGPT = async (req: Request, res: Response) => {
     const { entry, mood } = await req.body;
@@ -29,35 +30,50 @@ export const callGPT = async (req: Request, res: Response) => {
 
 }
 
+
+
 export const createMessage = async (req: Request, res: Response) => {
-    const { entry_id } = req.params;
+    const { user_id, entry_id } = req.params;
     const { role, content } = req.body;
     
     //call our service that will either create a conversation or return the existing one depending on if it was created or not
     const conversation = await getOrCreateConversationService(entry_id)
+    
+    //get existing conversation messages
+    const history = await getMessageHistoryService(conversation.id)
+
+    //if there are no messages yet, flag that this is the first message
+    let isFirstMessage = history.length === 0;
 
     //Create the message in journal_ai_messages
-    const createdMessage = await createMessageService(role, content, conversation.id)
+    const userMessage = await createMessageService(role, content, conversation.id)
 
-    //AI needs to respond to the message
-    // const response = await openai.responses.create({
-    //     model: "gpt-5-mini",
-    //     input: [
-    //         {
-    //             role: "system",
-    //             content: SYSTEM_PROMPT
-    //         },
-    //         {
-    //             role: "user",
-    //             content: `
-    //             Journal entry:
-    //             ${entry}
-    //             `
-    //         }
-    //     ]
-    // });
+    //Prepare AI context
+    let messagesForAI = [
+        { role: "system", content: SYSTEM_PROMPT }
+    ];
 
-    res.status(200).json(createdMessage)
+    if (isFirstMessage) {
+        const journalEntry = await getEntryById(user_id, entry_id)
+        messagesForAI.push({
+            role: "user",
+            content: `Here is my journal entry: "${journalEntry.content}"`
+        });
+    } else {
+        // Standard flow: add history + new message
+        const formattedHistory = history.map(m => ({ role: m.role, content: m.content }));
+        messagesForAI = [...messagesForAI, ...formattedHistory, { role, content }];
+    }
+
+
+    const aiResponse = await openai.responses.create({
+        model: "gpt-5-mini",
+        input: messagesForAI as any
+    });
+
+    // aiResponse.output_text <-- create a message in DB for this
+
+    res.status(200).json(aiResponse)
 }
 
 //getMessages

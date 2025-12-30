@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 
 app.use("/user/:user_id", journalRoutes)
-app.use("/ai-conversations", gptRoutes)
+app.use("/user/:user_id/ai-conversations", gptRoutes)
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

@@ -30,8 +30,6 @@ export const callGPT = async (req: Request, res: Response) => {
 
 }
 
-
-
 export const createMessage = async (req: Request, res: Response) => {
     const { user_id, entry_id } = req.params;
     const { role, content } = req.body;
@@ -70,22 +68,26 @@ export const createMessage = async (req: Request, res: Response) => {
         model: "gpt-5-mini",
         input: messagesForAI as any
     });
-
+    
     // aiResponse.output_text <-- create a message in DB for this
+    const aiMessage = await createMessageService('system', aiResponse.output_text, conversation.id)
 
     res.status(200).json(aiResponse)
 }
 
 //getMessages
-// export const getMessages = async (req: Request, res: Response) => {
+export const getMessages = async (req: Request, res: Response) => {
+    const { entry_id } = req.params;
     //parameters: entryId
-    //check if conversation exists, if not return
-    //if so, retrieve the conversation id
+    const conversation = await getOrCreateConversationService(entry_id)
 
     //parameters: conversationId
     //get all messages with that conversation id
+    //get existing conversation messages
+    const history = await getMessageHistoryService(conversation.id)
 
-// }
+    res.status(200).json(history)
+}
 
 //deleteConversation <-- if they delete the entry or just delete the conversation all together and want to start over
 

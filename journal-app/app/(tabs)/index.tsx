@@ -87,7 +87,6 @@ export default function HomeScreen() {
   }
   return (
     <View style={styles.container}>
-      {/* <SafeAreaView style={{flex: 1}}> */}
       <SafeAreaView edges={['top']}>
 
         <Text style={styles.title}>Your Journal</Text>
@@ -131,7 +130,6 @@ export default function HomeScreen() {
             </View>
           </View>
         )}
-      {/* </SafeAreaView> */}
 
     </View>
   );

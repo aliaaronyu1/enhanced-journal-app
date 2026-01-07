@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState, useEffect, useContext } from "react";
 import { View, TextInput, Button, StyleSheet, Alert, ActivityIndicator, Text, TouchableOpacity, Modal, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import AntDesign from '@expo/vector-icons/AntDesign';
 import axios from "axios";
 import { AuthContext } from "@/context/AuthContext";
 import { useRef } from "react";
@@ -160,11 +161,21 @@ export default function EditEntryScreen() {
               </View>
             </TouchableOpacity>
           </Modal>
+          
           <Text style={{ fontSize: 12, color: "#888" }}>
             {saving ? "Saving..." : "All changes saved"}
           </Text>
         </View>
+        
       </ScrollView>
+      <View>
+          <TouchableOpacity
+            style={styles.fab}
+            // onPress={handleAddEntry}
+            activeOpacity={0.8}>
+            <AntDesign name="open-ai" size={64} color="black" />
+          </TouchableOpacity>
+        </View>
     </KeyboardAvoidingView>
   );
 }
@@ -211,5 +222,22 @@ const styles = StyleSheet.create({
   },
   menuText: {
     fontSize: 16,
+  },
+  fab: {
+    position: "absolute",
+    right: 24,
+    bottom: 24,
+    width: 64,
+    height: 64,
+    borderRadius: 28,
+    justifyContent: "center",
+    alignItems: "center",
+
+    // subtle shadow
+    elevation: 6, // Android
+    shadowColor: "#000", // iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
 });

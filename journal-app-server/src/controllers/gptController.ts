@@ -55,7 +55,7 @@ export const createMessage = async (req: Request, res: Response) => {
         const journalEntry = await getEntryById(user_id, entry_id)
         messagesForAI.push({
             role: "user",
-            content: `Here is my journal entry: "${journalEntry.content}"`
+            content: `Here is my journal entry: "${journalEntry.body}"`
         });
     } else {
         // Standard flow: add history + new message

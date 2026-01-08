@@ -72,7 +72,10 @@ export const createMessage = async (req: Request, res: Response) => {
     // aiResponse.output_text <-- create a message in DB for this
     const aiMessage = await createMessageService('system', aiResponse.output_text, conversation.id)
 
-    res.status(200).json(aiResponse)
+    res.status(200).json({
+        userMessage,
+        aiResponse
+    })
 }
 
 //getMessages

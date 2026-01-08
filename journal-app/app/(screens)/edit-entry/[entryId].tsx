@@ -171,7 +171,12 @@ export default function EditEntryScreen() {
       <View>
           <TouchableOpacity
             style={styles.fab}
-            // onPress={handleAddEntry}
+            onPress={() => {
+              router.push({
+                pathname: "/(screens)/edit-entry/ai-chat",
+                params: {entryId}
+              })
+            }}
             activeOpacity={0.8}>
             <AntDesign name="open-ai" size={64} color="black" />
           </TouchableOpacity>

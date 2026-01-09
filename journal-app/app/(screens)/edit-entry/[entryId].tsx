@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState, useEffect, useContext } from "react";
 import { View, TextInput, Button, StyleSheet, Alert, ActivityIndicator, Text, TouchableOpacity, Modal, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import AntDesign from '@expo/vector-icons/AntDesign';
+import Entypo from '@expo/vector-icons/Entypo';
 import axios from "axios";
 import { AuthContext } from "@/context/AuthContext";
 import { useRef } from "react";
@@ -95,6 +96,27 @@ export default function EditEntryScreen() {
       </View>
     )
   }
+
+  const handleResubmit = async () => {
+    try {
+      const res = await fetch(
+        `${API_URL}/user/${user.id}/ai-conversations/${entryId}/submit-entry`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ entryBody: body }),
+        }
+      );
+
+      router.push({
+        pathname: "/(screens)/edit-entry/ai-chat",
+        params: { entryId }
+      })
+    } catch (err) {
+      console.error("Failed to resubmit entry", err);
+    }
+
+  }
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -169,7 +191,7 @@ export default function EditEntryScreen() {
         
       </ScrollView>
       <View>
-          <TouchableOpacity
+          <TouchableOpacity //This will be the submit your entry to GPT button
             style={styles.fab}
             onPress={() => {
               router.push({
@@ -178,7 +200,13 @@ export default function EditEntryScreen() {
               })
             }}
             activeOpacity={0.8}>
-            <AntDesign name="open-ai" size={64} color="black" />
+            <Entypo name="chat" size={64} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity //This will be the continue chat button
+            style={styles.fab2} 
+            onPress={handleResubmit}
+            activeOpacity={0.8}>
+            <AntDesign name="send" size={64} color="black" />
           </TouchableOpacity>
         </View>
     </KeyboardAvoidingView>
@@ -231,6 +259,23 @@ const styles = StyleSheet.create({
   fab: {
     position: "absolute",
     right: 24,
+    bottom: 24,
+    width: 64,
+    height: 64,
+    borderRadius: 28,
+    justifyContent: "center",
+    alignItems: "center",
+
+    // subtle shadow
+    elevation: 6, // Android
+    shadowColor: "#000", // iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
+  fab2: {
+    position: "relative",
+    // right: 24,
     bottom: 24,
     width: 64,
     height: 64,

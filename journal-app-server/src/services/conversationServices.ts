@@ -39,3 +39,38 @@ export const getMessageHistoryService = async (conversation_id: string) => {
 
     return result.rows;
 }
+
+export const createEntrySnapshotService = async (
+  conversation_id: string,
+  journal_entry_id: string,
+  entry_body: string
+) => {
+  const result = await pool.query(
+    `
+    INSERT INTO journal_ai_entry_snapshots
+      (conversation_id, journal_entry_id, entry_body)
+    VALUES ($1, $2, $3)
+    RETURNING *;
+    `,
+    [conversation_id, journal_entry_id, entry_body]
+  );
+
+  return result.rows[0];
+};
+
+export const getLatestEntrySnapshotService = async (
+  conversation_id: string
+) => {
+  const result = await pool.query(
+    `
+    SELECT *
+    FROM journal_ai_entry_snapshots
+    WHERE conversation_id = $1
+    ORDER BY created_at DESC
+    LIMIT 1;
+    `,
+    [conversation_id]
+  );
+
+  return result.rows[0];
+};

@@ -19,7 +19,7 @@ import { v4 as uuid } from "uuid";
 
 type Message = {
     id: string;
-    role: "user" | "system";
+    role: "user" | "assistant";
     content: string;
 };
 
@@ -50,7 +50,7 @@ export default function AiChat() {
     //     };
     // }, []);
 
-    // 1️⃣ Load existing conversation
+    //Load existing conversation
     useEffect(() => {
         if (!entryId) return;
 
@@ -60,7 +60,7 @@ export default function AiChat() {
                     `${API_URL}/user/${user.id}/ai-conversations/${entryId}`
                 );
                 const data = await res.json();
-                setMessages(data);
+                setMessages(data.messages);
             } catch (err) {
                 console.error("Failed to load messages", err);
             } finally {
@@ -71,42 +71,36 @@ export default function AiChat() {
         loadMessages();
     }, [entryId]);
 
-    // 2️⃣ Auto-scroll on new message
+    //Auto-scroll on new message
     useEffect(() => {
         listRef.current?.scrollToEnd({ animated: true });
     }, [messages]);
 
-    // 3️⃣ Send message
+    //Send message
     const sendMessage = async () => {
         if (!input.trim() || loading) return;
 
-        const userMsg: Message = {
+        const optimisticMsg: Message = {
             id: uuid(),
             role: "user",
             content: input.trim(),
         };
 
-        setMessages(prev => [...prev, userMsg]);
+        setMessages(prev => [...prev, optimisticMsg]);
         setInput("");
         setLoading(true);
 
         try {
             const res = await fetch(
-                `${API_URL}/user/${user.id}/ai-conversations/${entryId}`,
+                `${API_URL}/user/${user.id}/ai-conversations/${entryId}/message`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ role: 'user', content: userMsg.content }),
+                    body: JSON.stringify({ content: optimisticMsg.content }),
                 }
             );
 
-            const { userMessage, aiResponse } = await res.json();
-
-            const aiMessage: Message = {
-                id: uuid(),
-                role: "system",
-                content: aiResponse.output_text,
-            };
+            const aiMessage: Message = await res.json();
 
             setMessages(prev => [...prev, aiMessage]);
         } catch (err) {

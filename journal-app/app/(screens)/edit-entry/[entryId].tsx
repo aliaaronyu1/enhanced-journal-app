@@ -1,8 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState, useEffect, useContext } from "react";
 import { View, TextInput, Button, StyleSheet, Alert, ActivityIndicator, Text, TouchableOpacity, Modal, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
-import AntDesign from '@expo/vector-icons/AntDesign';
-import Entypo from '@expo/vector-icons/Entypo';
 import axios from "axios";
 import { AuthContext } from "@/context/AuthContext";
 import { useRef } from "react";
@@ -15,13 +13,13 @@ export default function EditEntryScreen() {
   const { entryId } = useLocalSearchParams(); // entry ID from route
   const [saving, setSaving] = useState(false);
   const router = useRouter();
-
+  const [hasConversation, setHasConversation] = useState(true)
   const [menuVisible, setMenuVisible] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [loading, setLoading] = useState(true);
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-
+  const [submitting, setSubmitting] = useState(false);
   const savingRequestRef = useRef<Promise<void> | null>(null);
 
   useEffect(() => {
@@ -99,6 +97,7 @@ export default function EditEntryScreen() {
 
   const handleResubmit = async () => {
     try {
+      setSubmitting(true)
       const res = await fetch(
         `${API_URL}/user/${user.id}/ai-conversations/${entryId}/submit-entry`,
         {
@@ -107,7 +106,7 @@ export default function EditEntryScreen() {
           body: JSON.stringify({ entryBody: body }),
         }
       );
-
+      setSubmitting(false)
       router.push({
         pathname: "/(screens)/edit-entry/ai-chat",
         params: { entryId }
@@ -183,32 +182,38 @@ export default function EditEntryScreen() {
               </View>
             </TouchableOpacity>
           </Modal>
-          
+
           <Text style={{ fontSize: 12, color: "#888" }}>
             {saving ? "Saving..." : "All changes saved"}
           </Text>
         </View>
-        
+
       </ScrollView>
       <View>
-          <TouchableOpacity //This will be the submit your entry to GPT button
-            style={styles.fab}
-            onPress={() => {
-              router.push({
-                pathname: "/(screens)/edit-entry/ai-chat",
-                params: {entryId}
-              })
-            }}
-            activeOpacity={0.8}>
-            <Entypo name="chat" size={64} color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity //This will be the continue chat button
-            style={styles.fab2} 
-            onPress={handleResubmit}
-            activeOpacity={0.8}>
-            <AntDesign name="send" size={64} color="black" />
+        <View style={styles.fabContainer}>
+          {hasConversation && (
+            <TouchableOpacity
+              style={styles.secondaryButton}
+              onPress={handleResubmit}
+              activeOpacity={0.7}
+              disabled={submitting}
+            >
+              {submitting ?
+                <Text style={styles.secondaryButtonText}>Submitting...</Text> :
+                <Text style={styles.secondaryButtonText}>Submit Journal Entry</Text>
+              }
+            </TouchableOpacity>
+          )}
+
+          <TouchableOpacity
+            style={styles.mainButton}
+            onPress={() => router.push({ pathname: "/(screens)/edit-entry/ai-chat", params: { entryId } })}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.buttonText}>Continue Chat</Text>
           </TouchableOpacity>
         </View>
+      </View>
     </KeyboardAvoidingView>
   );
 }
@@ -256,38 +261,56 @@ const styles = StyleSheet.create({
   menuText: {
     fontSize: 16,
   },
-  fab: {
+  fabContainer: {
     position: "absolute",
     right: 24,
     bottom: 24,
-    width: 64,
-    height: 64,
-    borderRadius: 28,
-    justifyContent: "center",
-    alignItems: "center",
-
-    // subtle shadow
-    elevation: 6, // Android
-    shadowColor: "#000", // iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    flexDirection: "column",
+    gap: 12,
+    alignItems: "flex-end",
   },
-  fab2: {
-    position: "relative",
-    // right: 24,
-    bottom: 24,
-    width: 64,
-    height: 64,
+  
+  mainButton: {
+    paddingVertical: 16,
+    paddingHorizontal: 24,
     borderRadius: 28,
+    backgroundColor: "#007AFF",
     justifyContent: "center",
     alignItems: "center",
-
-    // subtle shadow
-    elevation: 6, // Android
-    shadowColor: "#000", // iOS
-    shadowOffset: { width: 0, height: 2 },
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
+    shadowRadius: 8,
+    minWidth: 160,
+  },
+  
+  secondaryButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 24,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 2,
+    borderColor: "#007AFF",
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
     shadowRadius: 4,
+    minWidth: 140,
+  },
+  
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#FFFFFF",
+  },
+  
+  secondaryButtonText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#007AFF",
   },
 });

@@ -57,12 +57,10 @@ export const createMessage = async (req: Request, res: Response) => {
             })),
         ].filter(Boolean);
 
-        console.log("creating response from AI")
         const aiResponse = await openai.responses.create({
             model: "gpt-5-mini",
             input: messagesForAI as any
         });
-        console.log("AI response created", aiResponse)
 
         const aiMessage = await createMessageService('assistant', aiResponse.output_text, conversation.id)
 

@@ -141,6 +141,8 @@ export default function EditEntryScreen() {
           <TextInput
             style={styles.titleInput}
             value={title}
+            placeholder="Title..."
+            placeholderTextColor="#999"
             onChangeText={(text) => {
               setTitle(text);
               autoSave(text, body);
@@ -150,6 +152,8 @@ export default function EditEntryScreen() {
           <TextInput
             style={[styles.input]}
             value={body}
+            placeholder="Write your thoughts..."
+            placeholderTextColor="#999"
             onChangeText={(text) => {
               setBody(text);
               autoSave(title, text);
@@ -209,8 +213,9 @@ export default function EditEntryScreen() {
             style={styles.mainButton}
             onPress={() => router.push({ pathname: "/(screens)/edit-entry/ai-chat", params: { entryId } })}
             activeOpacity={0.8}
+            disabled={submitting}
           >
-            <Text style={styles.buttonText}>Continue Chat</Text>
+            <Text style={styles.buttonText}>Chat with AI</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -230,7 +235,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,
-    minHeight: 200
+    minHeight: 200,
+    flex: 1
   },
   header: {
     flexDirection: "row",

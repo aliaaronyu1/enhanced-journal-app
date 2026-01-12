@@ -101,6 +101,7 @@ export default function NewEntryScreen() {
           <TextInput
             style={styles.titleInput}
             placeholder="Title..."
+            placeholderTextColor="#999"
             value={title}
             onChangeText={(text) => {
               autoSave(text, body)
@@ -112,6 +113,7 @@ export default function NewEntryScreen() {
             multiline
             scrollEnabled={false}
             placeholder="Write your thoughts..."
+            placeholderTextColor="#999"
             value={body}
             onChangeText={(text) => {
               autoSave(title, text)
@@ -177,7 +179,8 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     marginBottom: 20,
-    minHeight: 200
+    minHeight: 200,
+    flex: 1
   },
   modalOverlay: {
     flex: 1,

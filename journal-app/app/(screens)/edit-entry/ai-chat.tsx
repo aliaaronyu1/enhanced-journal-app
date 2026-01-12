@@ -16,7 +16,7 @@ import { AuthContext } from "@/context/AuthContext";
 import { API_URL } from "@/lib/api";
 // import { Keyboard } from "react-native";
 import { v4 as uuid } from "uuid";
-
+import TypingIndicator from "@/components/TypingIndicator"
 type Message = {
     id: string;
     role: "user" | "assistant";
@@ -149,6 +149,7 @@ export default function AiChat() {
                             <Text style={styles.messageText}>{item.content}</Text>
                         </View>
                     )}
+                    ListFooterComponent={loading ? <TypingIndicator /> : null}
                 />
                     {/* Input */}
                     <View style={styles.inputRow}>

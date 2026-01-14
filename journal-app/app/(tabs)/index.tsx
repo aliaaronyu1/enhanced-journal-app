@@ -1,19 +1,25 @@
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, Button, TouchableOpacity } from "react-native";
+import { View, FlatList, ActivityIndicator } from "react-native";
 import { AuthContext } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import { API_URL } from "@/lib/api";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-
+import {
+  Text,
+  Card,
+  FAB,
+  Divider,
+  useTheme
+} from "react-native-paper";
 
 export default function HomeScreen() {
   const { user } = useContext(AuthContext);
   const [entries, setEntries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const theme = useTheme();
 
   useEffect(() => {
     if (user?.id) {
@@ -51,150 +57,122 @@ export default function HomeScreen() {
 
   const fetchUsersEntries = async (userId: number) => {
     try {
-      const res = await axios.get(`${API_URL}/user/${userId}`)
-
-      // Map over entries and add formattedDate property
-      const formattedEntries = res.data.map((entry: any) => ({
-        ...entry,
-        formattedDate: formatEntryTime(entry.created_at),
-      }));
-
-      setEntries(formattedEntries)
+      const res = await axios.get(`${API_URL}/user/${userId}`);
+      setEntries(
+        res.data.map((entry: any) => ({
+          ...entry,
+          formattedDate: formatEntryTime(entry.created_at),
+        }))
+      );
     } catch (error) {
-      console.error("Error fetching entries:", error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const handleUpdateEntry = (entryId: number) => {
     router.push({
-      pathname: "/edit-entry/[entryId]", // the route file
-      params: { entryId: entryId }, // the dynamic param
+      pathname: "/edit-entry/[entryId]",
+      params: { entryId },
     });
-  }
+  };
 
   const handleAddEntry = () => {
-    router.push({ pathname: "/new-entry" });
-  }
+    router.push("/new-entry");
+  };
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#0000ff" />
+      <View style={{ flex: 1, justifyContent: "center" }}>
+        <ActivityIndicator size="large" />
       </View>
     );
   }
+
   return (
-    <View style={styles.container}>
+    <View style={{ paddingHorizontal: 10, paddingTop: 12, flex: 1 }}>
       <SafeAreaView edges={['top']}>
 
-        <Text style={styles.title}>Your Journal</Text>
+        <Text variant="headlineLarge" style={{ marginBottom: 12 }}>
+          My Journal
+        </Text>
       </SafeAreaView>
+
       {entries.length === 0 ? (
-        <View>
-          <Text>Recent entries will appear here.</Text>
-          <View>
-            <TouchableOpacity
-              style={styles.fab}
-              onPress={handleAddEntry}
-              activeOpacity={0.8}>
-              <Ionicons name="add" size={32} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      ) :
-        (
-          <View style={styles.content}>
-            <FlatList
-              data={entries}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
-                <TouchableOpacity style={styles.entryContainer} onPress={() => { handleUpdateEntry(item.id) }}>
-                  <View style={styles.entryHeader}>
-                    <Text style={styles.entryTitle} numberOfLines={1}>{item.title}</Text>
-                    <Text style={styles.entryDate}>{item.formattedDate}</Text>
-                  </View>
-                  <View style={styles.divider} />
-                  <Text style={styles.entryBody} numberOfLines={3}>{item.body}</Text>
-                </TouchableOpacity>
-              )}
-            />
-            <View>
-              <TouchableOpacity
-                style={styles.fab}
-                onPress={handleAddEntry}
-                activeOpacity={0.8}>
-                <Ionicons name="add" size={32} color="#fff" />
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
+        <Text variant="bodyMedium" style={{ color: "#6b7280" }}>
+          Recent entries will appear here.
+        </Text>
+      ) : (
+        <FlatList
+          data={entries}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={{ padding: 10 }}
+          renderItem={({ item }) => (
+            <Card
+              style={{
+                marginBottom: 12,
+                backgroundColor: theme.colors.surface,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.1,
+                shadowRadius: 2,
+               }}
+              elevation={1}
+              onPress={() => handleUpdateEntry(item.id)}
+            >
+              <Card.Content>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text
+                    variant="titleMedium"
+                    numberOfLines={1}
+                    style={{ flex: 1 }}
+                  >
+                    {item.title || "Untitled"}
+                  </Text>
+                  <Text variant="labelSmall" style={{ marginLeft: 8 }}>
+                    {item.formattedDate}
+                  </Text>
+                </View>
+
+                <Divider style={{ marginVertical: 8 }} />
+
+                <Text
+                  variant="bodyMedium"
+                  numberOfLines={6}
+                  style={{ color: "#374151" }}
+                >
+                  {item.body}
+                </Text>
+              </Card.Content>
+            </Card>
+          )}
+        />
+      )}
+
+      <View
+        style={{
+          position: "absolute",
+          bottom: 20,
+          left: 0,
+          right: 0,
+          alignItems: "center",
+          borderRadius: 40
+        }}
+      >
+        <FAB
+          label="Begin Writing"
+          onPress={handleAddEntry}
+          theme={{ roundness: 40 }}
+        />
+      </View>
 
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 24,
-  },
-  content: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    // marginBottom: 12,
-  },
-  entryContainer: {
-    padding: 12,
-    marginBottom: 12,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  entryHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  entryDate: {
-    fontSize: 12,
-    color: "#6b7280",
-    marginLeft: 8,
-  },
-  entryTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#e5e7eb",
-    marginVertical: 8,
-  },
-  entryBody: {
-    fontSize: 16,
-    // marginTop: 4,
-    color: "#374151",
-  },
-  fab: {
-    position: "absolute",
-    right: 24,
-    bottom: 24,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#2563eb",
-    justifyContent: "center",
-    alignItems: "center",
-
-    // subtle shadow
-    elevation: 6, // Android
-    shadowColor: "#000", // iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-  },
-});

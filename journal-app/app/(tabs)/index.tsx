@@ -86,7 +86,7 @@ export default function HomeScreen() {
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: "center" }}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color ="#334155"/>
       </View>
     );
   }
@@ -94,7 +94,6 @@ export default function HomeScreen() {
   return (
     <View style={{ paddingHorizontal: 10, paddingTop: 12, flex: 1 }}>
       <SafeAreaView edges={['top']}>
-
         <Text variant="headlineLarge" style={{ marginBottom: 12 }}>
           My Journal
         </Text>

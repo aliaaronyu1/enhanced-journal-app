@@ -1,20 +1,28 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState, useEffect, useContext } from "react";
-import { View, TextInput, Button, StyleSheet, Alert, Text, TouchableOpacity, Modal, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import { useState, useEffect, useContext, useRef } from "react";
+import { View, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import axios from "axios";
 import { AuthContext } from "@/context/AuthContext";
-import { useRef } from "react";
 import { API_URL } from "@/lib/api";
 import { MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ActivityIndicator } from 'react-native-paper';
+
+import {
+  Text,
+  TextInput,
+  Button,
+  ActivityIndicator,
+  useTheme,
+  Surface,
+  IconButton
+} from "react-native-paper";
 
 export default function EditEntryScreen() {
   const { user } = useContext(AuthContext);
-  const { entryId } = useLocalSearchParams(); // entry ID from route
+  const { entryId } = useLocalSearchParams();
   const [saving, setSaving] = useState(false);
   const router = useRouter();
-  const [hasConversation, setHasConversation] = useState(true)
+  const [hasConversation, setHasConversation] = useState(true);
   const [menuVisible, setMenuVisible] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -22,6 +30,7 @@ export default function EditEntryScreen() {
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const savingRequestRef = useRef<Promise<void> | null>(null);
+  const theme = useTheme();
 
   useEffect(() => {
     fetchEntry();
@@ -33,7 +42,7 @@ export default function EditEntryScreen() {
       setTitle(res.data.title);
       setBody(res.data.body);
     } catch (error) {
-      Alert.alert("Error", "Could not load entry");
+      console.error("Could not load entry", error);
     } finally {
       setLoading(false);
     }
@@ -41,36 +50,23 @@ export default function EditEntryScreen() {
 
   const autoSave = (newTitle: string, newBody: string) => {
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
-
     saveTimeout.current = setTimeout(async () => {
       setSaving(true);
       const save = async () => {
         try {
-          if (!newTitle.trim() && !newBody.trim()) {
-            // optionally skip saving empty content
-            console.log("Empty content, skipping autosave");
-            return;
-          }
-          await axios.put(`${API_URL}/user/${user.id}/journal-entry/${entryId}`, {
-            title: newTitle,
-            body: newBody,
-          });
-          console.log("Auto-saved");
+          if (!newTitle.trim() && !newBody.trim()) return;
+          await axios.put(`${API_URL}/user/${user.id}/journal-entry/${entryId}`, { title: newTitle, body: newBody });
         } catch (err) {
           console.error("Auto-save failed", err);
         } finally {
           setSaving(false);
         }
-      }
+      };
 
-      if (savingRequestRef.current) {
-        await savingRequestRef.current.catch(() => { })
-      }
-
+      if (savingRequestRef.current) await savingRequestRef.current.catch(() => {});
       savingRequestRef.current = save();
-      await savingRequestRef.current
-      savingRequestRef.current = null
-
+      await savingRequestRef.current;
+      savingRequestRef.current = null;
     }, 1000);
   };
 
@@ -78,45 +74,38 @@ export default function EditEntryScreen() {
     try {
       await axios.delete(`${API_URL}/user/${user.id}/journal-entry/${entryId}`);
     } catch (error) {
-      console.error("Failed to delete empty draft", error);
+      console.error("Failed to delete draft", error);
     }
   };
 
   const handleBack = async () => {
-    if (!title.trim() && !body.trim()) {
-      await handleDelete();
-    }
+    if (!title.trim() && !body.trim()) await handleDelete();
     router.back();
-  }
-  if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
-      </View>
-    )
-  }
+  };
 
   const handleResubmit = async () => {
     try {
-      setSubmitting(true)
-      const res = await fetch(
-        `${API_URL}/user/${user.id}/ai-conversations/${entryId}/submit-entry`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ entryBody: body }),
-        }
-      );
-      setSubmitting(false)
-      router.push({
-        pathname: "/(screens)/edit-entry/ai-chat",
-        params: { entryId }
-      })
+      setSubmitting(true);
+      await fetch(`${API_URL}/user/${user.id}/ai-conversations/${entryId}/submit-entry`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ entryBody: body }),
+      });
+      setSubmitting(false);
+      router.push({ pathname: "/(screens)/edit-entry/ai-chat", params: { entryId } });
     } catch (err) {
       console.error("Failed to resubmit entry", err);
     }
+  };
 
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator animating size="large" color={theme.colors.primary} />
+      </View>
+    );
   }
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -127,20 +116,25 @@ export default function EditEntryScreen() {
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="interactive">
-        <View style={styles.container}>
-          <SafeAreaView edges={['top']}>
-            <View style={styles.header}>
-              <TouchableOpacity onPress={handleBack}>
-                <Text style={{ fontSize: 16, color: "#007AFF" }}>← Back</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setMenuVisible(true)}>
-                <MaterialIcons name="more-vert" size={28} color="black" />
-              </TouchableOpacity>
-            </View>
-          </SafeAreaView>
+        <SafeAreaView edges={["top"]} style={{ flex: 1, padding: 16 }}>
+          {/* Header */}
+          <View style={styles.header}>
+            <IconButton
+              icon="arrow-left"
+              size={20}
+              onPress={handleBack}
+              iconColor="#334155"
+            />
 
+            <TouchableOpacity onPress={() => setMenuVisible(true)}>
+              <MaterialIcons name="more-vert" size={28} color="#374151" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Title Input */}
           <TextInput
-            style={styles.titleInput}
+            mode="flat"
+            label="Title"
             value={title}
             placeholder="Title..."
             placeholderTextColor="#999"
@@ -148,10 +142,12 @@ export default function EditEntryScreen() {
               setTitle(text);
               autoSave(text, body);
             }}
+            style={{ marginBottom: 16, backgroundColor: "transparent", fontWeight: "bold", fontSize: 20 }}
           />
 
+          {/* Body Input */}
           <TextInput
-            style={[styles.input]}
+            mode="flat"
             value={body}
             placeholder="Write your thoughts..."
             placeholderTextColor="#999"
@@ -161,163 +157,49 @@ export default function EditEntryScreen() {
             }}
             multiline
             scrollEnabled={false}
+            style={{
+              minHeight: 200,
+              flex: 1,
+              backgroundColor: "transparent",
+              fontSize: 16,
+              marginBottom: 16,
+            }}
           />
-          <Modal
-            visible={menuVisible}
-            transparent
-            animationType="fade"
-            onRequestClose={() => setMenuVisible(false)}
-          >
-            <TouchableOpacity
-              style={styles.modalOverlay}
-              onPress={() => setMenuVisible(false)}
-            >
-              <View style={styles.menu}>
-                <TouchableOpacity
-                  style={styles.menuItem}
-                  onPress={async () => {
-                    setMenuVisible(false);
-                    await handleDelete();
-                    router.back();
-                  }}
-                >
-                  <MaterialIcons name="delete" size={20} color="red" />
-                  <Text style={[styles.menuText, { color: "red" }]}>Delete</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
-          </Modal>
 
-          <Text style={{ fontSize: 12, color: "#888" }}>
-            {saving ? "Saving..." : "All changes saved"}
-          </Text>
-        </View>
-
+          {/* Saving indicator */}
+          <Text style={{ fontSize: 12, color: "#888" }}>{saving ? "Saving..." : "All changes saved"}</Text>
+        </SafeAreaView>
       </ScrollView>
-      <View>
-        <View style={styles.fabContainer}>
-          {hasConversation && (
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={handleResubmit}
-              activeOpacity={0.7}
-              disabled={submitting}
-            >
-              {submitting ?
-                <Text style={styles.secondaryButtonText}>Submitting...</Text> :
-                <Text style={styles.secondaryButtonText}>Submit Journal Entry</Text>
-              }
-            </TouchableOpacity>
-          )}
 
-          <TouchableOpacity
-            style={styles.mainButton}
-            onPress={() => router.push({ pathname: "/(screens)/edit-entry/ai-chat", params: { entryId } })}
-            activeOpacity={0.8}
+      {/* Buttons */}
+      <View style={styles.fabContainer}>
+        {hasConversation && (
+          <Button
+            mode="outlined"
+            onPress={handleResubmit}
             disabled={submitting}
+            style={{ marginBottom: 12, borderRadius: 24 }}
+            contentStyle={{ paddingVertical: 12 }}
           >
-            <Text style={styles.buttonText}>Chat with AI</Text>
-          </TouchableOpacity>
-        </View>
+            {submitting ? "Submitting..." : "Submit Journal Entry"}
+          </Button>
+        )}
+
+        <Button
+          mode="contained"
+          onPress={() => router.push({ pathname: "/(screens)/edit-entry/ai-chat", params: { entryId } })}
+          disabled={submitting}
+          style={{ borderRadius: 28 }}
+          contentStyle={{ paddingVertical: 16 }}
+        >
+          Chat with AI
+        </Button>
       </View>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24 },
-  titleInput: {
-    fontWeight: "bold",
-    padding: 12,
-    borderRadius: 8,
-    fontSize: 20
-  },
-  input: {
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 12,
-    minHeight: 200,
-    flex: 1
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.1)",
-    justifyContent: "flex-start",
-    alignItems: "flex-end",
-    paddingTop: 50,
-    paddingRight: 12,
-  },
-  menu: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    elevation: 5,
-    paddingVertical: 8,
-    width: 140,
-  },
-  menuItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 12,
-    gap: 8,
-  },
-  menuText: {
-    fontSize: 16,
-  },
-  fabContainer: {
-    position: "absolute",
-    right: 24,
-    bottom: 24,
-    flexDirection: "column",
-    gap: 12,
-    alignItems: "flex-end",
-  },
-  
-  mainButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 28,
-    backgroundColor: "#007AFF",
-    justifyContent: "center",
-    alignItems: "center",
-    elevation: 6,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    minWidth: 160,
-  },
-  
-  secondaryButton: {
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 24,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 2,
-    borderColor: "#007AFF",
-    justifyContent: "center",
-    alignItems: "center",
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    minWidth: 140,
-  },
-  
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#FFFFFF",
-  },
-  
-  secondaryButtonText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#007AFF",
-  },
+  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
+  fabContainer: { paddingHorizontal: 16, paddingBottom: 24 },
 });

@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState, useEffect, useContext, useRef } from "react";
-import { View, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import { View, KeyboardAvoidingView, Platform, ScrollView, TouchableOpacity, StyleSheet, Keyboard } from "react-native";
 import axios from "axios";
 import { AuthContext } from "@/context/AuthContext";
 import { API_URL } from "@/lib/api";
@@ -14,7 +14,8 @@ import {
   ActivityIndicator,
   useTheme,
   Surface,
-  IconButton
+  IconButton,
+  FAB
 } from "react-native-paper";
 
 export default function EditEntryScreen() {
@@ -31,6 +32,22 @@ export default function EditEntryScreen() {
   const [submitting, setSubmitting] = useState(false);
   const savingRequestRef = useRef<Promise<void> | null>(null);
   const theme = useTheme();
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
+      setKeyboardHeight(e.endCoordinates.height);
+    });
+
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   useEffect(() => {
     fetchEntry();
@@ -172,28 +189,29 @@ export default function EditEntryScreen() {
       </ScrollView>
 
       {/* Buttons */}
-      <View style={styles.fabContainer}>
+      <View
+        style={[
+          styles.fabContainer,
+          {
+            bottom: keyboardHeight ? keyboardHeight + 16 : 24,
+          },
+        ]}>
         {hasConversation && (
-          <Button
-            mode="outlined"
-            onPress={handleResubmit}
+          <FAB
+            icon="robot"
+            onPress={() => router.push({ pathname: "/(screens)/edit-entry/ai-chat", params: { entryId } })}
             disabled={submitting}
-            style={{ marginBottom: 12, borderRadius: 24 }}
-            contentStyle={{ paddingVertical: 12 }}
-          >
-            {submitting ? "Submitting..." : "Submit Journal Entry"}
-          </Button>
+            style={styles.secondaryFab}
+            color={theme.colors.primary}
+          />
         )}
 
-        <Button
-          mode="contained"
-          onPress={() => router.push({ pathname: "/(screens)/edit-entry/ai-chat", params: { entryId } })}
+        <FAB
+          icon="send"
+          onPress={handleResubmit}
           disabled={submitting}
-          style={{ borderRadius: 28 }}
-          contentStyle={{ paddingVertical: 16 }}
-        >
-          Chat with AI
-        </Button>
+          style={styles.primaryFab}
+        />
       </View>
     </KeyboardAvoidingView>
   );
@@ -201,5 +219,26 @@ export default function EditEntryScreen() {
 
 const styles = StyleSheet.create({
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
-  fabContainer: { paddingHorizontal: 16, paddingBottom: 24 },
+  fabContainer: {
+    position: "absolute",
+    right: 20,
+    bottom: 24,
+    alignItems: "center",
+    gap: 12,
+    flexDirection: "row",
+    
+  },
+
+  primaryFab: {
+    backgroundColor: "#334155",
+    borderRadius: 999,
+  },
+
+  secondaryFab: {
+    backgroundColor: "rgba(255,255,255,0.9)",
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "rgba(148,163,184,0.3)",
+  },
+
 });

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { View, FlatList, ActivityIndicator } from "react-native";
+import { View, FlatList } from "react-native";
 import { AuthContext } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
 import { API_URL } from "@/lib/api";
@@ -11,7 +11,8 @@ import {
   Card,
   FAB,
   Divider,
-  useTheme
+  useTheme,
+  ActivityIndicator
 } from "react-native-paper";
 
 export default function HomeScreen() {

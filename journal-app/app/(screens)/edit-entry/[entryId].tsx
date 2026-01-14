@@ -1,12 +1,13 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState, useEffect, useContext } from "react";
-import { View, TextInput, Button, StyleSheet, Alert, ActivityIndicator, Text, TouchableOpacity, Modal, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import { View, TextInput, Button, StyleSheet, Alert, Text, TouchableOpacity, Modal, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import axios from "axios";
 import { AuthContext } from "@/context/AuthContext";
 import { useRef } from "react";
 import { API_URL } from "@/lib/api";
 import { MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ActivityIndicator } from 'react-native-paper';
 
 export default function EditEntryScreen() {
   const { user } = useContext(AuthContext);
@@ -90,7 +91,7 @@ export default function EditEntryScreen() {
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" />
       </View>
     )
   }

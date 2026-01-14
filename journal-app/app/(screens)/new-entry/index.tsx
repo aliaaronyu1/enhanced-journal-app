@@ -1,5 +1,13 @@
-import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity, Modal, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { useContext, useState, useRef } from "react";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from "react-native";
 import axios from "axios";
 import { useRouter } from "expo-router";
 import { AuthContext } from "@/context/AuthContext";
@@ -7,22 +15,34 @@ import { API_URL } from "@/lib/api";
 import { MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import {
+  Text,
+  TextInput,
+  ActivityIndicator,
+  IconButton,
+  useTheme,
+} from "react-native-paper";
+
 export default function NewEntryScreen() {
   const { user } = useContext(AuthContext);
+  const router = useRouter();
+  const theme = useTheme();
+
   const [title, setTitle] = useState("");
-  const [saving, setSaving] = useState(false);
   const [body, setBody] = useState("");
+  const [saving, setSaving] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+
   const entryIdRef = useRef<number | null>(null);
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const savingRequestRef = useRef<Promise<void> | null>(null);
-  const router = useRouter();
 
   const autoSave = (newTitle: string, newBody: string) => {
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
 
     saveTimeout.current = setTimeout(async () => {
       setSaving(true);
+
       const save = async () => {
         try {
           if (!entryIdRef.current) {
@@ -30,28 +50,24 @@ export default function NewEntryScreen() {
               title: newTitle,
               body: newBody,
             });
-            const newId = res.data.id
-            entryIdRef.current = newId;
+            entryIdRef.current = res.data.id;
           } else {
-            await axios.put(`${API_URL}/user/${user.id}/journal-entry/${entryIdRef.current}`, {
-              title: newTitle,
-              body: newBody,
-            });
+            await axios.put(
+              `${API_URL}/user/${user.id}/journal-entry/${entryIdRef.current}`,
+              { title: newTitle, body: newBody }
+            );
           }
-          console.log("Auto-saved");
         } catch (err) {
           console.error("Auto-save failed", err);
         } finally {
           setSaving(false);
         }
-      }
+      };
 
-      //if a previous state is running, wait for it to finish to avoid race conditions
       if (savingRequestRef.current) {
-        await savingRequestRef.current.catch(() => { });//ignore previous errors
+        await savingRequestRef.current.catch(() => {});
       }
 
-      //track this save request
       savingRequestRef.current = save();
       await savingRequestRef.current;
       savingRequestRef.current = null;
@@ -61,96 +77,108 @@ export default function NewEntryScreen() {
   const handleDelete = async () => {
     if (!entryIdRef.current) return;
     try {
-      await axios.delete(`${API_URL}/user/${user.id}/journal-entry/${entryIdRef.current}`);
-    } catch (error) {
-      console.error("Failed to delete empty draft", error);
+      await axios.delete(
+        `${API_URL}/user/${user.id}/journal-entry/${entryIdRef.current}`
+      );
+    } catch (err) {
+      console.error("Delete failed", err);
     }
   };
 
   const handleBack = async () => {
-    if (entryIdRef.current && (!title.trim() && !body.trim())) {
+    if (entryIdRef.current && !title.trim() && !body.trim()) {
       await handleDelete();
     }
     router.back();
-  }
+  };
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={0}
     >
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="interactive">
-        <View style={styles.container}>
-          <SafeAreaView edges={['top']}>
-
-            <TouchableOpacity onPress={handleBack}>
-              <Text style={{ fontSize: 16, color: "#007AFF" }}>← Back</Text>
-            </TouchableOpacity>
-          </SafeAreaView>
-
+        keyboardDismissMode="interactive"
+      >
+        <SafeAreaView edges={["top"]} style={styles.container}>
+          {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>New Journal Entry</Text>
+            <IconButton
+              icon="arrow-left"
+              size={20}
+              onPress={handleBack}
+              iconColor="#334155"
+            />
+
             <TouchableOpacity onPress={() => setMenuVisible(true)}>
-              <MaterialIcons name="more-vert" size={28} color="black" />
+              <MaterialIcons name="more-vert" size={26} color="#374151" />
             </TouchableOpacity>
           </View>
 
+          {/* Title */}
           <TextInput
-            style={styles.titleInput}
-            placeholder="Title..."
-            placeholderTextColor="#999"
+            mode="flat"
+            label="Title"
             value={title}
+            placeholder="Title..."
             onChangeText={(text) => {
-              autoSave(text, body)
-              setTitle(text)
+              setTitle(text);
+              autoSave(text, body);
             }}
+            style={styles.titleInput}
           />
+
+          {/* Body */}
           <TextInput
-            style={styles.input}
+            mode="flat"
+            value={body}
+            placeholder="Write your thoughts..."
+            onChangeText={(text) => {
+              setBody(text);
+              autoSave(title, text);
+            }}
             multiline
             scrollEnabled={false}
-            placeholder="Write your thoughts..."
-            placeholderTextColor="#999"
-            value={body}
-            onChangeText={(text) => {
-              autoSave(title, text)
-              setBody(text)
-            }}
+            style={styles.bodyInput}
           />
-          {/* Delete modal */}
-          <Modal
-            visible={menuVisible}
-            transparent
-            animationType="fade"
-            onRequestClose={() => setMenuVisible(false)}
-          >
-            <TouchableOpacity
-              style={styles.modalOverlay}
-              onPress={() => setMenuVisible(false)}
-            >
-              <View style={styles.menu}>
-                <TouchableOpacity
-                  style={styles.menuItem}
-                  onPress={async () => {
-                    setMenuVisible(false);
-                    await handleDelete();
-                    router.back();
-                  }}
-                >
-                  <MaterialIcons name="delete" size={20} color="red" />
-                  <Text style={[styles.menuText, { color: "red" }]}>Delete</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
-          </Modal>
-          <Text style={{ fontSize: 12, color: "#888" }}>
+
+          {/* Saving indicator */}
+          <Text style={styles.savingText}>
             {saving ? "Saving..." : "All changes saved"}
           </Text>
-        </View>
+        </SafeAreaView>
       </ScrollView>
+
+      {/* Delete Modal (unchanged behavior, improved look) */}
+      <Modal
+        visible={menuVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setMenuVisible(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          onPress={() => setMenuVisible(false)}
+        >
+          <View style={styles.menu}>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={async () => {
+                setMenuVisible(false);
+                await handleDelete();
+                router.back();
+              }}
+            >
+              <MaterialIcons name="delete" size={20} color="#b91c1c" />
+              <Text style={[styles.menuText, { color: "#b91c1c" }]}>
+                Delete entry
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -158,30 +186,35 @@ export default function NewEntryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
+    padding: 16,
   },
+
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 16,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
+
   titleInput: {
-    padding: 12,
+    backgroundColor: "transparent",
     fontSize: 20,
-    fontWeight: "bold",
-    borderRadius: 8,
+    fontWeight: "600",
+    marginBottom: 16,
   },
-  input: {
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 20,
-    minHeight: 200,
-    flex: 1
+
+  bodyInput: {
+    backgroundColor: "transparent",
+    fontSize: 16,
+    flex: 1,
+    marginBottom: 16,
   },
+
+  savingText: {
+    fontSize: 12,
+    color: "#888",
+  },
+
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.1)",
@@ -190,19 +223,22 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingRight: 12,
   },
+
   menu: {
     backgroundColor: "#fff",
     borderRadius: 8,
-    elevation: 5,
+    elevation: 6,
     paddingVertical: 8,
-    width: 140,
+    width: 160,
   },
+
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
     padding: 12,
-    gap: 8,
+    gap: 10,
   },
+
   menuText: {
     fontSize: 16,
   },

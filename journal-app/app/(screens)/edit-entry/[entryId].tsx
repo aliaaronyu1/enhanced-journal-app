@@ -10,10 +10,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Text,
   TextInput,
-  Button,
   ActivityIndicator,
   useTheme,
-  Surface,
   IconButton,
   FAB
 } from "react-native-paper";
@@ -23,7 +21,7 @@ export default function EditEntryScreen() {
   const { entryId } = useLocalSearchParams();
   const [saving, setSaving] = useState(false);
   const router = useRouter();
-  const [hasConversation, setHasConversation] = useState(true);
+  const [hasConversation, setHasConversation] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -64,6 +62,24 @@ export default function EditEntryScreen() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+        if (!entryId) return;
+
+        const loadMessages = async () => {
+            try {
+                const res = await fetch(
+                    `${API_URL}/user/${user.id}/ai-conversations/${entryId}`
+                );
+                const data = await res.json();
+                setHasConversation(data.messages.length !== 0)
+            } catch (err) {
+                console.error("Failed to load messages", err);
+            }
+        };
+
+        loadMessages();
+    }, [entryId]);
 
   const autoSave = (newTitle: string, newBody: string) => {
     if (saveTimeout.current) clearTimeout(saveTimeout.current);
@@ -240,5 +256,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(148,163,184,0.3)",
   },
-
 });

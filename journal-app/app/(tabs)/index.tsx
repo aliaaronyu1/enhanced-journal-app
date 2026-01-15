@@ -15,6 +15,7 @@ import {
   ActivityIndicator
 } from "react-native-paper";
 import { MotiView } from "moti";
+import { MotiPressable } from 'moti/interactions';
 
 export default function HomeScreen() {
   const { user } = useContext(AuthContext);
@@ -22,7 +23,7 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const theme = useTheme();
-  const [isPressed, setIsPressed] = useState(false);
+  const [fabIsPressed, setFabIsPressed] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
@@ -113,49 +114,66 @@ export default function HomeScreen() {
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{ padding: 10 }}
           renderItem={({ item }) => (
-            <Card
-              style={{
-                marginBottom: 12,
-                backgroundColor: theme.colors.surface,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 1 },
-                shadowOpacity: 0.1,
-                shadowRadius: 2,
+            <MotiPressable
+              onPress={() => {
+                setTimeout(() => handleUpdateEntry(item.id), 300);
               }}
-              elevation={1}
-              onPress={() => handleUpdateEntry(item.id)}
+              animate={({ pressed }) => {
+                'worklet';
+                return {
+                  scale: pressed ? 0.96 : 1,
+                  opacity: pressed ? 0.9 : 1,
+                };
+              }}
+              transition={{
+                type: 'spring',
+                damping: 15,
+                stiffness: 300,
+              }}
+              style={{ marginBottom: 12 }}
             >
-              <Card.Content>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
-                    variant="titleMedium"
-                    numberOfLines={1}
-                    style={{ flex: 1 }}
+              <Card
+                style={{
+                  backgroundColor: theme.colors.surface,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 2,
+                }}
+                elevation={1}
+              >
+                <Card.Content>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
                   >
-                    {item.title || "Untitled"}
-                  </Text>
-                  <Text variant="labelSmall" style={{ marginLeft: 8 }}>
-                    {item.formattedDate}
-                  </Text>
-                </View>
+                    <Text
+                      variant="titleMedium"
+                      numberOfLines={1}
+                      style={{ flex: 1, fontWeight: '600' }}
+                    >
+                      {item.title || "Untitled"}
+                    </Text>
+                    <Text variant="labelSmall" style={{ marginLeft: 8, color: '#64748b' }}>
+                      {item.formattedDate}
+                    </Text>
+                  </View>
 
-                <Divider style={{ marginVertical: 8 }} />
+                  <Divider style={{ marginVertical: 8 }} />
 
-                <Text
-                  variant="bodyMedium"
-                  numberOfLines={6}
-                  style={{ color: "#374151" }}
-                >
-                  {item.body}
-                </Text>
-              </Card.Content>
-            </Card>
+                  <Text
+                    variant="bodyMedium"
+                    numberOfLines={6}
+                    style={{ color: "#374151", lineHeight: 20 }}
+                  >
+                    {item.body}
+                  </Text>
+                </Card.Content>
+              </Card>
+            </MotiPressable>
           )}
         />
       )}
@@ -170,20 +188,19 @@ export default function HomeScreen() {
         }}
       >
         <Pressable
-          onPressIn={() => setIsPressed(true)}
-          onPressOut={() => setIsPressed(false)}
+          onPressIn={() => setFabIsPressed(true)}
+          onPressOut={() => setFabIsPressed(false)}
           onPress={handleAddEntry}
         >
           <MotiView
             animate={{
-              scale: isPressed ? 0.9 : 1,
-              backgroundColor: isPressed ? "#475569" : theme.colors.primary,
+              scale: fabIsPressed ? 0.9 : 1,
+              backgroundColor: fabIsPressed ? "#475569" : theme.colors.primary,
             }}
             transition={{
               type: 'spring',
               damping: 10,
               stiffness: 500,
-              
             }}
             style={{
               borderRadius: 40,

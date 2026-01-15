@@ -6,7 +6,7 @@ import {
   Modal,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
+  ScrollView
 } from "react-native";
 import axios from "axios";
 import { useRouter } from "expo-router";
@@ -22,6 +22,7 @@ import {
   IconButton,
   useTheme,
 } from "react-native-paper";
+import { MotiView } from 'moti';
 
 export default function NewEntryScreen() {
   const { user } = useContext(AuthContext);
@@ -65,7 +66,7 @@ export default function NewEntryScreen() {
       };
 
       if (savingRequestRef.current) {
-        await savingRequestRef.current.catch(() => {});
+        await savingRequestRef.current.catch(() => { });
       }
 
       savingRequestRef.current = save();
@@ -93,93 +94,113 @@ export default function NewEntryScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
+    <MotiView
+      from={{
+        opacity: 0,
+        scale: 0.8,
+      }}
+      animate={{
+        opacity: 1,
+        scale: 1,
+      }}
+      exit={{
+        opacity: 0,
+        scale: 0.8,
+      }}
+      transition={{
+        type: 'timing',
+        duration: 400,
+      }}
       style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="interactive"
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <SafeAreaView edges={["top"]} style={styles.container}>
-          {/* Header */}
-          <View style={styles.header}>
-            <IconButton
-              icon="arrow-left"
-              size={20}
-              onPress={handleBack}
-              iconColor="#334155"
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+        >
+          <SafeAreaView edges={["top"]} style={styles.container}>
+            {/* Header */}
+            <View style={styles.header}>
+              <IconButton
+                icon="arrow-left"
+                size={20}
+                onPress={handleBack}
+                iconColor="#334155"
+              />
+
+              <TouchableOpacity onPress={() => setMenuVisible(true)}>
+                <MaterialIcons name="more-vert" size={26} color="#374151" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Title */}
+            <TextInput
+              mode="flat"
+              label="Title"
+              value={title}
+              placeholder="Title..."
+              onChangeText={(text) => {
+                setTitle(text);
+                autoSave(text, body);
+              }}
+              style={styles.titleInput}
             />
 
-            <TouchableOpacity onPress={() => setMenuVisible(true)}>
-              <MaterialIcons name="more-vert" size={26} color="#374151" />
-            </TouchableOpacity>
-          </View>
-
-          {/* Title */}
-          <TextInput
-            mode="flat"
-            label="Title"
-            value={title}
-            placeholder="Title..."
-            onChangeText={(text) => {
-              setTitle(text);
-              autoSave(text, body);
-            }}
-            style={styles.titleInput}
-          />
-
-          {/* Body */}
-          <TextInput
-            mode="flat"
-            value={body}
-            placeholder="Write your thoughts..."
-            onChangeText={(text) => {
-              setBody(text);
-              autoSave(title, text);
-            }}
-            multiline
-            scrollEnabled={false}
-            style={styles.bodyInput}
-          />
-
-          {/* Saving indicator */}
-          <Text style={styles.savingText}>
-            {saving ? "Saving..." : "All changes saved"}
-          </Text>
-        </SafeAreaView>
-      </ScrollView>
-
-      {/* Delete Modal (unchanged behavior, improved look) */}
-      <Modal
-        visible={menuVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setMenuVisible(false)}
-      >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          onPress={() => setMenuVisible(false)}
-        >
-          <View style={styles.menu}>
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={async () => {
-                setMenuVisible(false);
-                await handleDelete();
-                router.back();
+            {/* Body */}
+            <TextInput
+              mode="flat"
+              value={body}
+              placeholder="Write your thoughts..."
+              onChangeText={(text) => {
+                setBody(text);
+                autoSave(title, text);
               }}
-            >
-              <MaterialIcons name="delete" size={20} color="#b91c1c" />
-              <Text style={[styles.menuText, { color: "#b91c1c" }]}>
-                Delete entry
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
-    </KeyboardAvoidingView>
+              multiline
+              scrollEnabled={false}
+              style={styles.bodyInput}
+            />
+
+            {/* Saving indicator */}
+            <Text style={styles.savingText}>
+              {saving ? "Saving..." : "All changes saved"}
+            </Text>
+          </SafeAreaView>
+        </ScrollView>
+
+        {/* Delete Modal (unchanged behavior, improved look) */}
+        <Modal
+          visible={menuVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setMenuVisible(false)}
+        >
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            onPress={() => setMenuVisible(false)}
+          >
+            <View style={styles.menu}>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={async () => {
+                  setMenuVisible(false);
+                  await handleDelete();
+                  router.back();
+                }}
+              >
+                <MaterialIcons name="delete" size={20} color="#b91c1c" />
+                <Text style={[styles.menuText, { color: "#b91c1c" }]}>
+                  Delete entry
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      </KeyboardAvoidingView>
+    </MotiView>
   );
 }
 

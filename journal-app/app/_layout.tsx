@@ -9,10 +9,10 @@ const theme = {
     ...MD3LightTheme.colors,
 
     primary: "#334155",
-    onPrimary: "#FFFFFF",
+    onPrimary: "#94a3b8",
 
     primaryContainer: "#334155",
-    onPrimaryContainer: "#FFFFFF",
+    onPrimaryContainer: "#94a3b8",
 
     secondary: "#34C759",
     onSecondary: "#FFFFFF",

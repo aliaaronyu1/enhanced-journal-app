@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { View, FlatList } from "react-native";
+import { View, FlatList, Pressable } from "react-native";
 import { AuthContext } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
 import { API_URL } from "@/lib/api";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   Text,
   Card,
@@ -14,6 +14,7 @@ import {
   useTheme,
   ActivityIndicator
 } from "react-native-paper";
+import { MotiView } from "moti";
 
 export default function HomeScreen() {
   const { user } = useContext(AuthContext);
@@ -21,6 +22,7 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const theme = useTheme();
+  const [isPressed, setIsPressed] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
@@ -80,13 +82,15 @@ export default function HomeScreen() {
   };
 
   const handleAddEntry = () => {
-    router.push("/new-entry");
+    setTimeout(() => {
+      router.push("/new-entry");
+    }, 300);
   };
 
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: "center" }}>
-        <ActivityIndicator size="large" color ="#334155"/>
+        <ActivityIndicator size="large" color="#334155" />
       </View>
     );
   }
@@ -117,7 +121,7 @@ export default function HomeScreen() {
                 shadowOffset: { width: 0, height: 1 },
                 shadowOpacity: 0.1,
                 shadowRadius: 2,
-               }}
+              }}
               elevation={1}
               onPress={() => handleUpdateEntry(item.id)}
             >
@@ -155,7 +159,6 @@ export default function HomeScreen() {
           )}
         />
       )}
-
       <View
         style={{
           position: "absolute",
@@ -163,16 +166,49 @@ export default function HomeScreen() {
           left: 0,
           right: 0,
           alignItems: "center",
-          borderRadius: 40
+          // borderRadius: 40
         }}
       >
-        <FAB
-          label="Begin Writing"
+        <Pressable
+          onPressIn={() => setIsPressed(true)}
+          onPressOut={() => setIsPressed(false)}
           onPress={handleAddEntry}
-          theme={{ roundness: 40 }}
-        />
+        >
+          <MotiView
+            animate={{
+              scale: isPressed ? 0.9 : 1,
+              backgroundColor: isPressed ? "#475569" : theme.colors.primary,
+            }}
+            transition={{
+              type: 'spring',
+              damping: 10,
+              stiffness: 500,
+              
+            }}
+            style={{
+              borderRadius: 40,
+              elevation: 4,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 4.65,
+            }}
+          >
+            <View pointerEvents="none">
+              <FAB
+                icon={() => (
+                  <MaterialCommunityIcons name="pencil" size={20} color="#fff" />
+                )}
+                label="Begin Writing"
+                onPress={handleAddEntry}
+                style={{ backgroundColor: 'transparent' }}
+                theme={{ roundness: 40 }}
+                color="#fff"
+              />
+            </View>
+          </MotiView>
+        </Pressable>
       </View>
-
     </View>
   );
 }

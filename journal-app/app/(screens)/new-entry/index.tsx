@@ -171,7 +171,6 @@ export default function NewEntryScreen() {
           </SafeAreaView>
         </ScrollView>
 
-        {/* Delete Modal (unchanged behavior, improved look) */}
         <Modal
           visible={menuVisible}
           transparent

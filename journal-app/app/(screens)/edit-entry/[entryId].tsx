@@ -87,8 +87,12 @@ export default function EditEntryScreen() {
       setSaving(true);
       const save = async () => {
         try {
-          if (!newTitle.trim() && !newBody.trim()) return;
-          await axios.put(`${API_URL}/user/${user.id}/journal-entry/${entryId}`, { title: newTitle, body: newBody });
+          if (!newTitle.trim() && !newBody.trim()) {
+            await handleDelete()
+          }
+          else {
+            await axios.put(`${API_URL}/user/${user.id}/journal-entry/${entryId}`, { title: newTitle, body: newBody });
+          }
         } catch (err) {
           console.error("Auto-save failed", err);
         } finally {

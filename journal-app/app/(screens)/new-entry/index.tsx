@@ -52,6 +52,9 @@ export default function NewEntryScreen() {
               body: newBody,
             });
             entryIdRef.current = res.data.id;
+          } 
+          else if (entryIdRef.current && !newTitle.trim() && !newBody.trim()){
+            await handleDelete()
           } else {
             await axios.put(
               `${API_URL}/user/${user.id}/journal-entry/${entryIdRef.current}`,

@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { useState, useContext } from "react";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
@@ -41,66 +41,69 @@ export default function RegisterScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Card
-        style={{ ...styles.card, backgroundColor: theme.colors.surface }}
-        elevation={0}
-      >
-        <Card.Content>
-          <Text variant="headlineLarge" style={styles.title}>
-            Create account
-          </Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 
-          <Text
-            variant="bodyMedium"
-            style={{ color: "#6b7280", marginBottom: 24 }}
-          >
-            Start your journaling journey
-          </Text>
+      <View style={styles.container}>
+        <Card
+          style={{ ...styles.card, backgroundColor: theme.colors.surface }}
+          elevation={0}
+        >
+          <Card.Content>
+            <Text variant="headlineLarge" style={styles.title}>
+              Create account
+            </Text>
 
-          <TextInput
-            label="Email"
-            mode="outlined"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            style={styles.input}
-          />
+            <Text
+              variant="bodyMedium"
+              style={{ color: "#6b7280", marginBottom: 24 }}
+            >
+              Start your journaling journey
+            </Text>
 
-          <TextInput
-            label="Password"
-            mode="outlined"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            style={styles.input}
-          />
+            <TextInput
+              label="Email"
+              mode="outlined"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              style={styles.input}
+            />
 
-          <Button
-            mode="contained"
-            onPress={handleRegister}
-            style={styles.button}
-            contentStyle={{ paddingVertical: 6 }}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="white" />
-            ) : (
-              "Register"
-            )}
-          </Button>
+            <TextInput
+              label="Password"
+              mode="outlined"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              style={styles.input}
+            />
 
-          <Button
-            mode="text"
-            onPress={() => router.push("/(auth)/login")}
-            style={{ marginTop: 12 }}
-          >
-            Already have an account? Login
-          </Button>
-        </Card.Content>
-      </Card>
-    </View>
+            <Button
+              mode="contained"
+              onPress={handleRegister}
+              style={styles.button}
+              contentStyle={{ paddingVertical: 6 }}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                "Register"
+              )}
+            </Button>
+
+            <Button
+              mode="text"
+              onPress={() => router.push("/(auth)/login")}
+              style={{ marginTop: 12 }}
+            >
+              Already have an account? Login
+            </Button>
+          </Card.Content>
+        </Card>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 

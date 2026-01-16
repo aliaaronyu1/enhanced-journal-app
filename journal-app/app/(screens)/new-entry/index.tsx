@@ -116,6 +116,7 @@ export default function NewEntryScreen() {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
       >
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
@@ -163,14 +164,14 @@ export default function NewEntryScreen() {
               scrollEnabled={false}
               style={styles.bodyInput}
             />
-
-            {/* Saving indicator */}
-            <Text style={styles.savingText}>
-              {saving ? "Saving..." : "All changes saved"}
-            </Text>
           </SafeAreaView>
         </ScrollView>
 
+        <View style={{ paddingLeft: 40, paddingBottom: 8, backgroundColor: '#ffffff00' }}>
+          <Text style={{ fontSize: 12, color: "#888" }}>
+            {saving ? "Saving..." : "All changes saved"}
+          </Text>
+        </View>
         <Modal
           visible={menuVisible}
           transparent
@@ -228,11 +229,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     flex: 1,
     marginBottom: 16,
-  },
-
-  savingText: {
-    fontSize: 12,
-    color: "#888",
   },
 
   modalOverlay: {

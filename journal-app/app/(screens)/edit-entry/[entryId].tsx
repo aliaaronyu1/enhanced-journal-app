@@ -215,12 +215,13 @@ export default function EditEntryScreen() {
                 marginBottom: 16,
               }}
             />
-
-            {/* Saving indicator */}
-            <Text style={{ fontSize: 12, color: "#888" }}>{saving ? "Saving..." : "All changes saved"}</Text>
           </SafeAreaView>
         </ScrollView>
-
+        <View style={{ paddingLeft: 40, paddingBottom: 8, backgroundColor: 'transparent' }}>
+          <Text style={{ fontSize: 12, color: "#888" }}>
+            {saving ? "Saving..." : "All changes saved"}
+          </Text>
+        </View>
         {/* Buttons */}
         <View
           style={[

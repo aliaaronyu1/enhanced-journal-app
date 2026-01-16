@@ -52,8 +52,8 @@ export default function NewEntryScreen() {
               body: newBody,
             });
             entryIdRef.current = res.data.id;
-          } 
-          else if (entryIdRef.current && !newTitle.trim() && !newBody.trim()){
+          }
+          else if (entryIdRef.current && !newTitle.trim() && !newBody.trim()) {
             await handleDelete()
           } else {
             await axios.put(
@@ -180,14 +180,33 @@ export default function NewEntryScreen() {
         <Modal
           visible={menuVisible}
           transparent
-          animationType="fade"
+          animationType="none"
           onRequestClose={() => setMenuVisible(false)}
         >
+          {/* Backdrop */}
           <TouchableOpacity
+            activeOpacity={1}
             style={styles.modalOverlay}
             onPress={() => setMenuVisible(false)}
           >
-            <View style={styles.menu}>
+            <MotiView
+              from={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ type: 'timing', duration: 300 }}
+              style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.4)' }]}
+            />
+
+            {/* Animated Menu Card */}
+            <MotiView
+              from={{ opacity: 0, scale: 0.9, translateY: 20 }}
+              animate={{ opacity: 1, scale: 1, translateY: 0 }}
+              transition={{ type: 'spring', damping: 15 }}
+              style={styles.menuCard}
+            >
+              <View style={styles.menuHeader}>
+                <Text style={styles.menuTitle}>Entry Options</Text>
+              </View>
+
               <TouchableOpacity
                 style={styles.menuItem}
                 onPress={async () => {
@@ -196,12 +215,22 @@ export default function NewEntryScreen() {
                   router.back();
                 }}
               >
-                <MaterialIcons name="delete" size={20} color="#b91c1c" />
-                <Text style={[styles.menuText, { color: "#b91c1c" }]}>
-                  Delete entry
-                </Text>
+                <View style={styles.deleteIconCircle}>
+                  <MaterialIcons name="delete-outline" size={22} color="#ef4444" />
+                </View>
+                <View>
+                  <Text style={styles.deleteText}>Delete Entry</Text>
+                  <Text style={styles.deleteSubtext}>This action cannot be undone</Text>
+                </View>
               </TouchableOpacity>
-            </View>
+
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setMenuVisible(false)}
+              >
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+            </MotiView>
           </TouchableOpacity>
         </Modal>
       </KeyboardAvoidingView>
@@ -235,32 +264,70 @@ const styles = StyleSheet.create({
     flex: 1,
     marginBottom: 16,
   },
-
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.1)",
-    justifyContent: "flex-start",
-    alignItems: "flex-end",
-    paddingTop: 50,
-    paddingRight: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
   },
-
-  menu: {
+  menuCard: {
     backgroundColor: "#fff",
-    borderRadius: 8,
-    elevation: 6,
-    paddingVertical: 8,
-    width: 160,
+    borderRadius: 20,
+    width: "100%",
+    maxWidth: 340,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
   },
-
+  menuHeader: {
+    marginBottom: 16,
+    alignItems: "center",
+  },
+  menuTitle: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#64748b",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 12,
-    gap: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    gap: 16,
+    backgroundColor: "#fef2f2",
+    borderRadius: 12,
   },
-
-  menuText: {
+  deleteIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#fee2e2",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  deleteText: {
     fontSize: 16,
+    fontWeight: "700",
+    color: "#b91c1c",
+  },
+  deleteSubtext: {
+    fontSize: 12,
+    color: "#ef4444",
+    opacity: 0.8,
+  },
+  cancelButton: {
+    marginTop: 12,
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  cancelText: {
+    fontSize: 16,
+    color: "#475569",
+    fontWeight: "500",
   },
 });

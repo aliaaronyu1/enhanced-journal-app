@@ -67,8 +67,6 @@ export const updateJournalEntryById = async (req: Request, res: Response) => {
 export const deleteJournalEntryById = async (req: Request, res: Response) => {
     const { user_id, entry_id } = req.params;
     if (!user_id || !entry_id) return res.status(400).json({ msg: "Missing user id or entry id" });
-    //i think if i delete entry, i have to also delete all conversations and messages.
-    //I previously thought that if I just deleted the entry, the convo and messages will delete automatically because of foreign keys we setup
     try {
         const deleteEntry = await deleteEntryById(user_id, entry_id);
 

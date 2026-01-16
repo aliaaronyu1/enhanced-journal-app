@@ -40,13 +40,13 @@ export default function Root() {
           />
           <Stack.Screen
             name="(screens)/edit-entry/[entryId]"
-            options={{ animation: 'fade_from_bottom' }}
+            options={{ animation: 'slide_from_right' }}
           />
           <Stack.Screen
             name="(screens)/new-entry/index"
             options={{ 
               animation: 'fade_from_bottom', 
-              presentation: 'modal' 
+              presentation: 'modal'
             }}
             
           />

@@ -1,8 +1,8 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { View, FlatList, Pressable } from "react-native";
+import { View, FlatList, Pressable, RefreshControl } from "react-native";
 import { AuthContext } from "@/context/AuthContext";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { API_URL } from "@/lib/api";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -25,11 +25,13 @@ export default function HomeScreen() {
   const theme = useTheme();
   const [fabIsPressed, setFabIsPressed] = useState(false);
 
-  useEffect(() => {
-    if (user?.id) {
-      fetchUsersEntries(user.id);
-    }
-  }, [user]);
+  useFocusEffect(
+    useCallback(() => {
+      if (user?.id) {
+        fetchUsersEntries(user.id);
+      }
+    }, [user])
+  );
 
   const formatEntryTime = (dateString: string) => {
     const now = new Date();
@@ -83,9 +85,7 @@ export default function HomeScreen() {
   };
 
   const handleAddEntry = () => {
-    setTimeout(() => {
-      router.push("/new-entry");
-    }, 300);
+    router.push("/new-entry");
   };
 
   if (loading) {
@@ -110,14 +110,21 @@ export default function HomeScreen() {
         </Text>
       ) : (
         <FlatList
-          data={entries}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={{ padding: 10 }}
-          renderItem={({ item }) => (
-            <MotiPressable
-              onPress={() => {
-                setTimeout(() => handleUpdateEntry(item.id), 300);
-              }}
+            data={entries}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={{ padding: 10 }}
+            refreshControl={
+              <RefreshControl
+                refreshing={loading}
+                onRefresh={() => user?.id && fetchUsersEntries(user.id)}
+                tintColor={theme.colors.onPrimary}
+                title="Updating your journal..."
+                titleColor={theme.colors.onPrimary}
+              />
+            }
+            renderItem={({ item }) => (
+              <MotiPressable
+              onPress={() => handleUpdateEntry(item.id)}
               animate={({ pressed }) => {
                 'worklet';
                 return {

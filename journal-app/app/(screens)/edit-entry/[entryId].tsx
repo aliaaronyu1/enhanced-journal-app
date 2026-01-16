@@ -206,6 +206,8 @@ export default function EditEntryScreen() {
                 autoSave(title, text);
               }}
               multiline
+              autoCorrect={true}
+              spellCheck={true}
               scrollEnabled={false}
               style={{
                 minHeight: 200,

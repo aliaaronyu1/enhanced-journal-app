@@ -160,6 +160,8 @@ export default function NewEntryScreen() {
                 setBody(text);
                 autoSave(title, text);
               }}
+              autoCorrect={true}
+              spellCheck={true}
               multiline
               scrollEnabled={false}
               style={styles.bodyInput}

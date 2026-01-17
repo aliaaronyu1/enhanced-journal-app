@@ -20,14 +20,14 @@ import {
   TextInput,
   ActivityIndicator,
   IconButton,
-  useTheme,
 } from "react-native-paper";
 import { MotiView } from 'moti';
+import { useAppTheme } from "@/constants/theme";
 
 export default function NewEntryScreen() {
   const { user } = useContext(AuthContext);
   const router = useRouter();
-  const theme = useTheme();
+  const theme = useAppTheme();
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -114,7 +114,7 @@ export default function NewEntryScreen() {
         type: 'timing',
         duration: 400,
       }}
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
     >
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -133,11 +133,11 @@ export default function NewEntryScreen() {
                 icon="arrow-left"
                 size={20}
                 onPress={handleBack}
-                iconColor="#334155"
+                iconColor={theme.colors.primary}
               />
 
               <TouchableOpacity onPress={() => setMenuVisible(true)}>
-                <MaterialIcons name="more-vert" size={26} color="#374151" />
+                <MaterialIcons name="more-vert" size={26} color={theme.colors.primary} />
               </TouchableOpacity>
             </View>
 
@@ -147,11 +147,12 @@ export default function NewEntryScreen() {
               label="Title"
               value={title}
               placeholder="Title..."
+              placeholderTextColor={theme.colors.onSurfaceVariant}
               onChangeText={(text) => {
                 setTitle(text);
                 autoSave(text, body);
               }}
-              style={styles.titleInput}
+              style={[styles.titleInput, { color: theme.colors.primary }]}
             />
 
             {/* Body */}
@@ -159,6 +160,7 @@ export default function NewEntryScreen() {
               mode="flat"
               value={body}
               placeholder="Write your thoughts..."
+              placeholderTextColor={theme.colors.onSurfaceVariant}
               onChangeText={(text) => {
                 setBody(text);
                 autoSave(title, text);
@@ -167,13 +169,13 @@ export default function NewEntryScreen() {
               spellCheck={true}
               multiline
               scrollEnabled={false}
-              style={styles.bodyInput}
+              style={[styles.bodyInput, { color: theme.colors.primary }]}
             />
           </SafeAreaView>
         </ScrollView>
 
-        <View style={{ paddingLeft: 40, paddingBottom: 8, backgroundColor: '#ffffff00' }}>
-          <Text style={{ fontSize: 12, color: "#888" }}>
+        <View style={{ paddingLeft: 40, paddingBottom: 8, backgroundColor: "transparent"}}>
+          <Text style={{ fontSize: 12, color: theme.colors.onSurfaceVariant }}>
             {saving ? "Saving..." : "All changes saved"}
           </Text>
         </View>
@@ -201,14 +203,14 @@ export default function NewEntryScreen() {
               from={{ opacity: 0, scale: 0.9, translateY: 20 }}
               animate={{ opacity: 1, scale: 1, translateY: 0 }}
               transition={{ type: 'spring', damping: 15 }}
-              style={styles.menuCard}
+              style={[styles.menuCard, { backgroundColor: theme.colors.surface }]}
             >
               <View style={styles.menuHeader}>
-                <Text style={styles.menuTitle}>Entry Options</Text>
+                <Text style={[styles.menuTitle, { color: theme.colors.onSurfaceVariant }]}>Entry Options</Text>
               </View>
 
               <TouchableOpacity
-                style={styles.menuItem}
+                style={[styles.menuItem, { backgroundColor: theme.colors.errorContainer }]}
                 onPress={async () => {
                   setMenuVisible(false);
                   await handleDelete();
@@ -216,7 +218,7 @@ export default function NewEntryScreen() {
                 }}
               >
                 <View style={styles.deleteIconCircle}>
-                  <MaterialIcons name="delete-outline" size={22} color="#ef4444" />
+                  <MaterialIcons name="delete-outline" size={22} color={theme.colors.error} />
                 </View>
                 <View>
                   <Text style={styles.deleteText}>Delete Entry</Text>
@@ -228,7 +230,7 @@ export default function NewEntryScreen() {
                 style={styles.cancelButton}
                 onPress={() => setMenuVisible(false)}
               >
-                <Text style={styles.cancelText}>Cancel</Text>
+                <Text style={[styles.cancelText, { color: theme.colors.onSurfaceVariant }]}>Cancel</Text>
               </TouchableOpacity>
             </MotiView>
           </TouchableOpacity>
@@ -299,7 +301,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 8,
     gap: 16,
-    backgroundColor: "#fef2f2",
     borderRadius: 12,
   },
   deleteIconCircle: {

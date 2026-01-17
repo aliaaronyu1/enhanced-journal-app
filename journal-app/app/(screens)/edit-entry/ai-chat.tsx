@@ -18,10 +18,9 @@ import {
   TextInput,
   IconButton,
   ActivityIndicator,
-  useTheme,
   Surface,
 } from "react-native-paper";
-
+import { useAppTheme } from "@/constants/theme";
 type Message = {
   id: string;
   role: "user" | "assistant";
@@ -31,7 +30,7 @@ type Message = {
 export default function AiChat() {
   const { entryId } = useLocalSearchParams<{ entryId: string }>();
   const router = useRouter();
-  const theme = useTheme();
+  const theme = useAppTheme();
   const { user } = useContext(AuthContext);
 
   const [messages, setMessages] = useState<Message[]>([]);
@@ -106,16 +105,19 @@ export default function AiChat() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { 
+        borderColor: theme.colors.surfaceDisabled,
+        backgroundColor: theme.colors.surface
+      }]}>
         <IconButton
           icon="arrow-left"
           size={20}
           onPress={() => router.back()}
-          iconColor="#334155"
+          iconColor={theme.colors.primary}
         />
-        <Text style={styles.headerTitle}>Reflection Assistant</Text>
+        <Text style={[styles.headerTitle, { color: theme.colors.primary }]}>Reflection Assistant</Text>
       </View>
 
       <KeyboardAvoidingView
@@ -133,24 +135,31 @@ export default function AiChat() {
               style={[
                 styles.message,
                 item.role === "user"
-                  ? styles.userMessage
-                  : styles.aiMessage,
+                  ? [styles.userMessage, { backgroundColor: theme.colors.chatUserBubble }]
+                  : [styles.aiMessage, {
+                    backgroundColor: theme.colors.chatAiBubble,
+                    borderColor: theme.colors.surfaceDisabled
+                  }],
               ]}
               elevation={item.role === "assistant" ? 1 : 0}
             >
-              <Text style={styles.messageText}>{item.content}</Text>
+              <Text style={[styles.messageText, { color: theme.colors.chatText }]}>{item.content}</Text>
             </Surface>
           )}
           ListFooterComponent={loading ? <TypingIndicator /> : null}
         />
 
         {/* Input */}
-        <View style={styles.inputRow}>
+        <View style={[styles.inputRow, {
+          borderColor: theme.colors.surfaceDisabled,
+          backgroundColor: theme.colors.surface
+        }]}>
           <TextInput
             mode="flat"
             value={input}
             onChangeText={setInput}
             placeholder="Ask or reflect…"
+            placeholderTextColor={theme.colors.onSurfaceVariant}
             multiline
             style={styles.input}
           />
@@ -158,7 +167,7 @@ export default function AiChat() {
             icon="send"
             onPress={sendMessage}
             disabled={loading}
-            iconColor="#334155"
+            iconColor={theme.colors.primary}
           />
         </View>
       </KeyboardAvoidingView>
@@ -169,7 +178,6 @@ export default function AiChat() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#f8fafc",
   },
 
   loader: {
@@ -184,14 +192,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderBottomWidth: 1,
-    borderColor: "rgba(226,232,240,0.6)",
-    backgroundColor: "rgba(255,255,255,0.8)",
   },
 
   headerTitle: {
     fontSize: 16,
     fontWeight: "500",
-    color: "#334155",
   },
 
   container: {
@@ -211,19 +216,15 @@ const styles = StyleSheet.create({
 
   userMessage: {
     alignSelf: "flex-end",
-    backgroundColor: "#e2e8f0",
   },
 
   aiMessage: {
     alignSelf: "flex-start",
-    backgroundColor: "#ffffff",
     borderWidth: 1,
-    borderColor: "rgba(226,232,240,0.8)",
   },
 
   messageText: {
     fontSize: 15,
-    color: "#0f172a",
     lineHeight: 22,
   },
 
@@ -233,8 +234,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderTopWidth: 1,
-    borderColor: "rgba(226,232,240,0.6)",
-    backgroundColor: "#ffffff",
   },
 
   input: {

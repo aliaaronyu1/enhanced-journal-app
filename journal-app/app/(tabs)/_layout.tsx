@@ -2,15 +2,17 @@ import { Tabs, Redirect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
-import { View, ActivityIndicator } from "react-native";
+import { View } from "react-native";
+import { ActivityIndicator } from "react-native-paper";
+import { theme } from "../../constants/theme";
 
 export default function RootLayout() {
   const { user } = useContext(AuthContext);
 
   if (user === undefined) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#334155" />
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: theme.colors.background }}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
@@ -25,13 +27,14 @@ export default function RootLayout() {
         headerShown: false,
 
         tabBarStyle: {
-          backgroundColor: "rgba(255,255,255,0.95)",
+          backgroundColor: theme.colors.surface,
           borderTopWidth: 1,
-          borderTopColor: "rgba(226,232,240,0.8)",
+          borderTopColor: theme.colors.outline,
+          elevation: 0,
         },
 
-        tabBarActiveTintColor: "#334155",
-        tabBarInactiveTintColor: "#94a3b8",
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.inactiveSlate,
 
         tabBarLabelStyle: {
           fontSize: 11,

@@ -10,9 +10,9 @@ import {
   TextInput,
   Button,
   Card,
-  useTheme,
   ActivityIndicator,
 } from "react-native-paper";
+import { useAppTheme } from "@/constants/theme";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -20,7 +20,7 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const { login } = useContext(AuthContext);
   const router = useRouter();
-  const theme = useTheme();
+  const theme = useAppTheme();
 
   const handleLogin = async () => {
     if (!email || !password) return;
@@ -42,17 +42,20 @@ export default function LoginScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
 
-        <Card style={{ ...styles.card, backgroundColor: theme.colors.surface }} elevation={0}>
+        <Card 
+          style={[styles.card, { backgroundColor: theme.colors.surface }]}
+          elevation={0}
+        >
           <Card.Content>
-            <Text variant="headlineLarge" style={styles.title}>
+            <Text variant="headlineLarge" style={[styles.title, { color: theme.colors.primary }]}>
               Welcome back
             </Text>
 
             <Text
               variant="bodyMedium"
-              style={{ color: "#6b7280", marginBottom: 24 }}
+              style={{ color: theme.colors.inactiveSlate, marginBottom: 24 }}
             >
               Sign in to continue journaling
             </Text>
@@ -65,6 +68,8 @@ export default function LoginScreen() {
               autoCapitalize="none"
               keyboardType="email-address"
               style={styles.input}
+              outlineColor={theme.colors.outline}
+              activeOutlineColor={theme.colors.primary}
             />
 
             <TextInput
@@ -74,17 +79,19 @@ export default function LoginScreen() {
               onChangeText={setPassword}
               secureTextEntry
               style={styles.input}
+              outlineColor={theme.colors.outline}
+              activeOutlineColor={theme.colors.primary}
             />
 
             <Button
               mode="contained"
               onPress={handleLogin}
-              style={styles.button}
+              style={[styles.button, { backgroundColor: theme.colors.primary }]}
               contentStyle={{ paddingVertical: 6 }}
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color="white" />
+                <ActivityIndicator color={theme.colors.onPrimary} />
               ) : (
                 "Login"
               )}
@@ -94,6 +101,7 @@ export default function LoginScreen() {
               mode="text"
               onPress={() => router.push("/(auth)/register")}
               style={{ marginTop: 12 }}
+              textColor={theme.colors.onSurfaceVariant}
             >
               Don’t have an account? Register
             </Button>
@@ -109,10 +117,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 20,
-    backgroundColor: "#f8fafc", // soft slate background
   },
   card: {
-    // borderRadius: 20,
     paddingVertical: 12,
   },
   title: {

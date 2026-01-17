@@ -11,10 +11,10 @@ import {
   Text,
   TextInput,
   ActivityIndicator,
-  useTheme,
   IconButton,
   FAB
 } from "react-native-paper";
+import { useAppTheme } from "@/constants/theme";
 
 export default function EditEntryScreen() {
   const { user } = useContext(AuthContext);
@@ -29,7 +29,7 @@ export default function EditEntryScreen() {
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const savingRequestRef = useRef<Promise<void> | null>(null);
-  const theme = useTheme();
+  const theme = useAppTheme();
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   useEffect(() => {
@@ -88,7 +88,8 @@ export default function EditEntryScreen() {
       const save = async () => {
         try {
           if (!newTitle.trim() && !newBody.trim()) {
-            await handleDelete()
+            // await handleDelete()
+            return
           }
           else {
             await axios.put(`${API_URL}/user/${user.id}/journal-entry/${entryId}`, { title: newTitle, body: newBody });
@@ -159,7 +160,7 @@ export default function EditEntryScreen() {
         type: 'timing',
         duration: 400,
       }}
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: theme.colors.background }}
     >
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -177,11 +178,11 @@ export default function EditEntryScreen() {
                 icon="arrow-left"
                 size={20}
                 onPress={handleBack}
-                iconColor="#334155"
+                iconColor={theme.colors.primary}
               />
 
               <TouchableOpacity onPress={() => setMenuVisible(true)}>
-                <MaterialIcons name="more-vert" size={28} color="#374151" />
+                <MaterialIcons name="more-vert" size={28} color={theme.colors.primary} />
               </TouchableOpacity>
             </View>
 
@@ -191,12 +192,12 @@ export default function EditEntryScreen() {
               label="Title"
               value={title}
               placeholder="Title..."
-              placeholderTextColor="#999"
+              placeholderTextColor={theme.colors.onSurfaceVariant}
               onChangeText={(text) => {
                 setTitle(text);
                 autoSave(text, body);
               }}
-              style={{ marginBottom: 16, backgroundColor: "transparent", fontWeight: "bold", fontSize: 20 }}
+              style={{ marginBottom: 16, backgroundColor: "transparent", fontWeight: "bold", fontSize: 20, color: theme.colors.primary }}
             />
 
             {/* Body Input */}
@@ -204,7 +205,7 @@ export default function EditEntryScreen() {
               mode="flat"
               value={body}
               placeholder="Write your thoughts..."
-              placeholderTextColor="#999"
+              placeholderTextColor={theme.colors.onSurfaceVariant}
               onChangeText={(text) => {
                 setBody(text);
                 autoSave(title, text);
@@ -219,12 +220,13 @@ export default function EditEntryScreen() {
                 backgroundColor: "transparent",
                 fontSize: 16,
                 marginBottom: 16,
+                color: theme.colors.primary
               }}
             />
           </SafeAreaView>
         </ScrollView>
         <View style={{ paddingLeft: 40, paddingBottom: 8, backgroundColor: 'transparent' }}>
-          <Text style={{ fontSize: 12, color: "#888" }}>
+          <Text style={{ fontSize: 12, color: theme.colors.onSurfaceVariant }}>
             {saving ? "Saving..." : "All changes saved"}
           </Text>
         </View>
@@ -243,7 +245,7 @@ export default function EditEntryScreen() {
               )}
               onPress={() => router.push({ pathname: "/(screens)/edit-entry/ai-chat", params: { entryId } })}
               disabled={submitting}
-              style={styles.secondaryFab}
+              style={[styles.secondaryFab, {backgroundColor: theme.colors.surface, borderColor: theme.colors.outline}]}
               color={theme.colors.primary}
             />
           )}
@@ -254,7 +256,7 @@ export default function EditEntryScreen() {
             )}
             onPress={handleResubmit}
             disabled={submitting}
-            style={styles.primaryFab}
+            style={[styles.primaryFab, {backgroundColor: theme.colors.primary}]}
             color="#ffffff"
           />
         </View>
@@ -279,9 +281,9 @@ export default function EditEntryScreen() {
               from={{ opacity: 0, scale: 0.9, translateY: 10 }}
               animate={{ opacity: 1, scale: 1, translateY: 0 }}
               transition={{ type: 'spring', damping: 20, stiffness: 150 }}
-              style={styles.menuCard}
+              style={[styles.menuCard, { backgroundColor: theme.colors.surface }]}
             >
-              <Text style={styles.menuTitle}>Entry Options</Text>
+              <Text style={[styles.menuTitle, {color: theme.colors.onSurfaceVariant}]}>Entry Options</Text>
 
               <View style={styles.menuSection}>
                 <TouchableOpacity
@@ -292,7 +294,7 @@ export default function EditEntryScreen() {
                   }}
                 >
                   <MaterialIcons name="auto-awesome" size={22} color={theme.colors.primary} />
-                  <Text style={styles.menuItemText}>Analyze with AI</Text>
+                  <Text style={[styles.menuItemText, { color: theme.colors.primary }]}>Analyze with AI</Text>
                 </TouchableOpacity>
 
                 {hasConversation && (
@@ -304,23 +306,23 @@ export default function EditEntryScreen() {
                     }}
                   >
                     <MaterialIcons name="chat-bubble-outline" size={22} color={theme.colors.primary} />
-                    <Text style={styles.menuItemText}>Continue Chatting</Text>
+                    <Text style={[styles.menuItemText, { color: theme.colors.primary }]}>Continue Chatting</Text>
                   </TouchableOpacity>
                 )}
               </View>
 
-              <View style={styles.divider} />
+              <View style={[styles.divider, { backgroundColor: theme.colors.outline }]} />
 
               <TouchableOpacity
-                style={[styles.menuItem, styles.deleteItem]}
+                style={[styles.menuItem, { backgroundColor: theme.colors.errorContainer }]}
                 onPress={async () => {
                   setMenuVisible(false);
                   await handleDelete();
                   router.back();
                 }}
               >
-                <MaterialIcons name="delete-outline" size={22} color="#ef4444" />
-                <Text style={[styles.menuItemText, { color: "#b91c1c" }]}>Delete Entry</Text>
+                <MaterialIcons name="delete-outline" size={22} color={theme.colors.error} />
+                <Text style={[styles.menuItemText, { color: theme.colors.error }]}>Delete Entry</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -350,7 +352,6 @@ const styles = StyleSheet.create({
   },
 
   primaryFab: {
-    backgroundColor: "#334155",
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
@@ -358,10 +359,8 @@ const styles = StyleSheet.create({
   },
 
   secondaryFab: {
-    backgroundColor: "white",
     borderRadius: 28,
     borderWidth: 1,
-    borderColor: "#e2e8f0",
     elevation: 2,
   },
   modalOverlay: {
@@ -385,7 +384,6 @@ const styles = StyleSheet.create({
   menuTitle: {
     fontSize: 12,
     fontWeight: "800",
-    color: "#94a3b8",
     textTransform: "uppercase",
     letterSpacing: 1.2,
     marginBottom: 12,
@@ -405,15 +403,10 @@ const styles = StyleSheet.create({
   menuItemText: {
     fontSize: 16,
     fontWeight: "500",
-    color: "#334155",
   },
   divider: {
     height: 1,
-    backgroundColor: "#f1f5f9",
     marginVertical: 12,
-  },
-  deleteItem: {
-    backgroundColor: "#fff1f2",
   },
   cancelButton: {
     marginTop: 8,

@@ -10,9 +10,10 @@ import {
   TextInput,
   Button,
   Card,
-  useTheme,
   ActivityIndicator,
 } from "react-native-paper";
+import { useAppTheme } from "@/constants/theme";
+
 
 export default function RegisterScreen() {
   const [email, setEmail] = useState("");
@@ -20,7 +21,7 @@ export default function RegisterScreen() {
   const [loading, setLoading] = useState(false);
   const { login } = useContext(AuthContext);
   const router = useRouter();
-  const theme = useTheme();
+  const theme = useAppTheme();
 
   const handleRegister = async () => {
     if (!email || !password) return;
@@ -43,19 +44,19 @@ export default function RegisterScreen() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <Card
           style={{ ...styles.card, backgroundColor: theme.colors.surface }}
           elevation={0}
         >
           <Card.Content>
-            <Text variant="headlineLarge" style={styles.title}>
+            <Text variant="headlineLarge" style={[styles.title, { color: theme.colors.primary }]}>
               Create account
             </Text>
 
             <Text
               variant="bodyMedium"
-              style={{ color: "#6b7280", marginBottom: 24 }}
+              style={{ color: theme.colors.inactiveSlate, marginBottom: 24 }}
             >
               Start your journaling journey
             </Text>
@@ -68,6 +69,8 @@ export default function RegisterScreen() {
               autoCapitalize="none"
               keyboardType="email-address"
               style={styles.input}
+              outlineColor={theme.colors.outline}
+              activeOutlineColor={theme.colors.primary}
             />
 
             <TextInput
@@ -77,17 +80,19 @@ export default function RegisterScreen() {
               onChangeText={setPassword}
               secureTextEntry
               style={styles.input}
+              outlineColor={theme.colors.outline}
+              activeOutlineColor={theme.colors.primary}
             />
 
             <Button
               mode="contained"
               onPress={handleRegister}
-              style={styles.button}
+              style={[styles.button, { backgroundColor: theme.colors.primary }]}
               contentStyle={{ paddingVertical: 6 }}
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color="white" />
+                <ActivityIndicator color={theme.colors.onPrimary} />
               ) : (
                 "Register"
               )}
@@ -97,6 +102,7 @@ export default function RegisterScreen() {
               mode="text"
               onPress={() => router.push("/(auth)/login")}
               style={{ marginTop: 12 }}
+              textColor={theme.colors.onSurfaceVariant}
             >
               Already have an account? Login
             </Button>
@@ -112,7 +118,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 20,
-    backgroundColor: "#f8fafc",
   },
   card: {
     paddingVertical: 12,

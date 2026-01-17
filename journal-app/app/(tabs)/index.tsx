@@ -11,18 +11,18 @@ import {
   Card,
   FAB,
   Divider,
-  useTheme,
   ActivityIndicator
 } from "react-native-paper";
 import { MotiView } from "moti";
 import { MotiPressable } from 'moti/interactions';
+import { useAppTheme } from "@/constants/theme";
 
 export default function HomeScreen() {
   const { user } = useContext(AuthContext);
   const [entries, setEntries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const theme = useTheme();
+  const theme = useAppTheme();
   const [fabIsPressed, setFabIsPressed] = useState(false);
 
   useFocusEffect(
@@ -91,7 +91,7 @@ export default function HomeScreen() {
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: "center" }}>
-        <ActivityIndicator size="large" color="#334155" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
@@ -105,7 +105,7 @@ export default function HomeScreen() {
       </SafeAreaView>
 
       {entries.length === 0 ? (
-        <Text variant="bodyMedium" style={{ color: "#6b7280" }}>
+        <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
           Recent entries will appear here.
         </Text>
       ) : (
@@ -164,7 +164,7 @@ export default function HomeScreen() {
                     >
                       {item.title || "Untitled"}
                     </Text>
-                    <Text variant="labelSmall" style={{ marginLeft: 8, color: '#64748b' }}>
+                    <Text variant="labelSmall" style={{ marginLeft: 8, color: theme.colors.onSurfaceVariant }}>
                       {item.formattedDate}
                     </Text>
                   </View>
@@ -202,7 +202,7 @@ export default function HomeScreen() {
           <MotiView
             animate={{
               scale: fabIsPressed ? 0.9 : 1,
-              backgroundColor: fabIsPressed ? "#475569" : theme.colors.primary,
+              backgroundColor: fabIsPressed ? theme.colors.primaryContainer : theme.colors.primary,
             }}
             transition={{
               type: 'spring',

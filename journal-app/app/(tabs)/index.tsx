@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { View, FlatList, Pressable, RefreshControl } from "react-native";
+import { View, FlatList, Pressable, RefreshControl, StyleSheet } from "react-native";
 import { AuthContext } from "@/context/AuthContext";
 import { useRouter, useFocusEffect } from "expo-router";
 import { API_URL } from "@/lib/api";
@@ -98,8 +98,8 @@ export default function HomeScreen() {
 
   return (
     <View style={{ paddingHorizontal: 10, paddingTop: 12, flex: 1 }}>
-      <SafeAreaView edges={['top']}>
-        <Text variant="headlineLarge" style={{ marginBottom: 12 }}>
+      <SafeAreaView edges={['top']} style={styles.header}>
+        <Text variant="headlineLarge" style={styles.title}>
           My Journal
         </Text>
       </SafeAreaView>
@@ -236,3 +236,14 @@ export default function HomeScreen() {
     </View>
   );
 }
+const styles = StyleSheet.create({
+  
+  header: {
+    paddingHorizontal: 24,
+    paddingBottom: 8,
+  },
+  title: {
+    // fontWeight: "800",
+    color: "#1e293b",
+  },
+})

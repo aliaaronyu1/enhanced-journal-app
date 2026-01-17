@@ -4,14 +4,20 @@ import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
-import { theme } from "../../constants/theme";
+import { useAppTheme } from "../../constants/theme";
 
 export default function RootLayout() {
   const { user } = useContext(AuthContext);
+  const theme = useAppTheme();
 
   if (user === undefined) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: theme.colors.background }}>
+      <View style={{ 
+        flex: 1, 
+        justifyContent: "center", 
+        alignItems: "center", 
+        backgroundColor: theme.colors.background 
+      }}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
@@ -25,12 +31,12 @@ export default function RootLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-
         tabBarStyle: {
           backgroundColor: theme.colors.surface,
           borderTopWidth: 1,
           borderTopColor: theme.colors.outline,
           elevation: 0,
+          shadowOpacity: 0,
         },
 
         tabBarActiveTintColor: theme.colors.primary,

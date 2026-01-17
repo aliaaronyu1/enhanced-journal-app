@@ -5,14 +5,14 @@ import { AuthContext } from "../../../context/AuthContext";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAppTheme } from "@/constants/theme";
-
+import { useAppThemeContext } from "@/context/ThemeContext";
 export default function SettingsScreen() {
   const { user, logout } = useContext(AuthContext);
   const router = useRouter();
   const theme = useAppTheme();
   
   const [loading, setLoading] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { isDarkMode, toggleTheme } = useAppThemeContext();
 
   const handleLogout = async () => {
     Alert.alert("Logout", "Are you sure you want to log out?", [
@@ -63,7 +63,11 @@ export default function SettingsScreen() {
             titleStyle={{ color: theme.colors.primary }}
             left={props => <List.Icon {...props} icon="brightness-6" color={theme.colors.primary}/>}
             right={() => (
-              <Switch value={isDarkMode} onValueChange={() => setIsDarkMode(!isDarkMode)} color={theme.colors.primaryContainer} />
+              <Switch
+                value={isDarkMode}
+                onValueChange={toggleTheme}
+                color={theme.colors.secondary}
+              />
             )}
           />
           <Divider style={{ backgroundColor: theme.colors.outline }}/>

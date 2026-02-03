@@ -97,9 +97,9 @@ export default function HomeScreen() {
   }
 
   return (
-    <View style={{ paddingHorizontal: 10, paddingTop: 12, flex: 1 }}>
+    <View style={{ paddingHorizontal: 10, paddingTop: 12, flex: 1, backgroundColor: theme.colors.background }}>
       <SafeAreaView edges={['top']} style={styles.header}>
-        <Text variant="headlineLarge" style={styles.title}>
+        <Text variant="headlineLarge" style={[styles.title, { color: theme.colors.onBackground}]}>
           My Journal
         </Text>
       </SafeAreaView>
@@ -174,7 +174,7 @@ export default function HomeScreen() {
                   <Text
                     variant="bodyMedium"
                     numberOfLines={6}
-                    style={{ color: "#374151", lineHeight: 20 }}
+                    style={{ color: theme.colors.primary, lineHeight: 20 }}
                   >
                     {item.body}
                   </Text>

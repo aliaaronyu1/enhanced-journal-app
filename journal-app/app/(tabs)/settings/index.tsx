@@ -36,9 +36,9 @@ export default function SettingsScreen() {
   };
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{flex: 1, backgroundColor: theme.colors.background}}>
       <SafeAreaView edges={['top']} style={styles.header}>
-        <Text variant="headlineLarge" style={[styles.title, { color: theme.colors.primary }]}>Settings</Text>
+        <Text variant="headlineLarge" style={[styles.title, { color: theme.colors.onBackground }]}>Settings</Text>
       </SafeAreaView>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -71,24 +71,24 @@ export default function SettingsScreen() {
             )}
           />
           <Divider style={{ backgroundColor: theme.colors.outline }}/>
-          <List.Item
+          {/* <List.Item
             title="Notifications"
             titleStyle={{ color: theme.colors.primary }}
             left={props => <List.Icon {...props} icon="bell-outline" color={theme.colors.primary}/>}
             onPress={() => {}}
-          />
+          /> */}
         </List.Section>
 
         <List.Section>
           <List.Subheader style={{ color: theme.colors.onSurfaceVariant }}>Account</List.Subheader>
-          <List.Item
+          {/* <List.Item
             title="Edit Profile"
             titleStyle={{ color: theme.colors.primary }}
             left={props => <List.Icon {...props} icon="account-edit-outline" color={theme.colors.primary} />}
             right={props => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant}/>}
             onPress={() => {}}
-          />
-          <Divider style={{ backgroundColor: theme.colors.outline }}/>
+          /> */}
+          {/* <Divider style={{ backgroundColor: theme.colors.outline }}/> */}
           <List.Item
             title="Logout"
             titleStyle={{ color: theme.colors.error }}
@@ -96,6 +96,7 @@ export default function SettingsScreen() {
             onPress={handleLogout}
             disabled={loading}
           />
+          <Divider style={{ backgroundColor: theme.colors.outline }}/>
         </List.Section>
 
         <View style={styles.footer}>

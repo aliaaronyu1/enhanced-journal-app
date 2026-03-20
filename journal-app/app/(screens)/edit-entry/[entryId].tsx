@@ -6,7 +6,9 @@ import { AuthContext } from "@/context/AuthContext";
 import { API_URL } from "@/lib/api";
 import { MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { MotiView } from "moti";
+// import { MotiView } from "moti";
+import { MotiView } from "@/components/MotiWrapper";
+
 import {
   Text,
   TextInput,

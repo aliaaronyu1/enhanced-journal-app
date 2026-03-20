@@ -21,7 +21,8 @@ import {
   ActivityIndicator,
   IconButton,
 } from "react-native-paper";
-import { MotiView } from 'moti';
+// import { MotiView } from 'moti';
+import { MotiView } from "@/components/MotiWrapper";
 import { useAppTheme } from "@/constants/theme";
 
 export default function NewEntryScreen() {

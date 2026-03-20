@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { View, FlatList, Pressable, RefreshControl, StyleSheet } from "react-native";
+import { View, FlatList, Pressable, RefreshControl, StyleSheet, Platform } from "react-native";
 import { AuthContext } from "@/context/AuthContext";
 import { useRouter, useFocusEffect } from "expo-router";
 import { API_URL } from "@/lib/api";
@@ -13,8 +13,10 @@ import {
   Divider,
   ActivityIndicator
 } from "react-native-paper";
-import { MotiView } from "moti";
-import { MotiPressable } from 'moti/interactions';
+// import { MotiView } from "moti";
+import { MotiView } from "@/components/MotiWrapper";
+// import { MotiPressable } from 'moti/interactions';
+import { MotiPressable } from "@/components/MotiWrapper";
 import { useAppTheme } from "@/constants/theme";
 
 export default function HomeScreen() {
@@ -99,7 +101,7 @@ export default function HomeScreen() {
   return (
     <View style={{ paddingHorizontal: 10, paddingTop: 12, flex: 1, backgroundColor: theme.colors.background }}>
       <SafeAreaView edges={['top']} style={styles.header}>
-        <Text variant="headlineLarge" style={[styles.title, { color: theme.colors.onBackground}]}>
+        <Text variant="headlineLarge" style={[styles.title, { color: theme.colors.onBackground }]}>
           My Journal
         </Text>
       </SafeAreaView>
@@ -110,35 +112,20 @@ export default function HomeScreen() {
         </Text>
       ) : (
         <FlatList
-            data={entries}
-            keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={{ padding: 10 }}
-            refreshControl={
-              <RefreshControl
-                refreshing={loading}
-                onRefresh={() => user?.id && fetchUsersEntries(user.id)}
-                tintColor={theme.colors.onPrimary}
-                title="Updating your journal..."
-                titleColor={theme.colors.onPrimary}
-              />
-            }
-            renderItem={({ item }) => (
-              <MotiPressable
-              onPress={() => handleUpdateEntry(item.id)}
-              animate={({ pressed }) => {
-                'worklet';
-                return {
-                  scale: pressed ? 0.96 : 1,
-                  opacity: pressed ? 0.9 : 1,
-                };
-              }}
-              transition={{
-                type: 'spring',
-                damping: 15,
-                stiffness: 300,
-              }}
-              style={{ marginBottom: 12 }}
-            >
+          data={entries}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={{ padding: 10 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={() => user?.id && fetchUsersEntries(user.id)}
+              tintColor={theme.colors.onPrimary}
+              title="Updating your journal..."
+              titleColor={theme.colors.onPrimary}
+            />
+          }
+          renderItem={({ item }) => {
+            const CardContent = (
               <Card
                 style={{
                   backgroundColor: theme.colors.surface,
@@ -160,11 +147,14 @@ export default function HomeScreen() {
                     <Text
                       variant="titleMedium"
                       numberOfLines={1}
-                      style={{ flex: 1, fontWeight: '600' }}
+                      style={{ flex: 1, fontWeight: "600" }}
                     >
                       {item.title || "Untitled"}
                     </Text>
-                    <Text variant="labelSmall" style={{ marginLeft: 8, color: theme.colors.onSurfaceVariant }}>
+                    <Text
+                      variant="labelSmall"
+                      style={{ marginLeft: 8, color: theme.colors.onSurfaceVariant }}
+                    >
                       {item.formattedDate}
                     </Text>
                   </View>
@@ -180,8 +170,36 @@ export default function HomeScreen() {
                   </Text>
                 </Card.Content>
               </Card>
-            </MotiPressable>
-          )}
+            );
+
+            return Platform.OS === "web" ? (
+              <Pressable
+                onPress={() => handleUpdateEntry(item.id)}
+                style={{ marginBottom: 12 }}
+              >
+                {CardContent}
+              </Pressable>
+            ) : (
+              <MotiPressable
+                onPress={() => handleUpdateEntry(item.id)}
+                animate={({ pressed }) => {
+                  "worklet";
+                  return {
+                    scale: pressed ? 0.96 : 1,
+                    opacity: pressed ? 0.9 : 1,
+                  };
+                }}
+                transition={{
+                  type: "spring",
+                  damping: 15,
+                  stiffness: 300,
+                }}
+                style={{ marginBottom: 12 }}
+              >
+                {CardContent}
+              </MotiPressable>
+            );
+          }}
         />
       )}
       <View
@@ -237,7 +255,7 @@ export default function HomeScreen() {
   );
 }
 const styles = StyleSheet.create({
-  
+
   header: {
     paddingHorizontal: 24,
     paddingBottom: 8,

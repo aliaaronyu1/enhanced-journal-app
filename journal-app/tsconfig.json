@@ -4,7 +4,7 @@
     "strict": true,
     "target": "ES2017",          // ensures web compatibility
     "module": "ESNext",          // needed for web build
-    "moduleResolution": "node",  // resolves modules correctly
+    "moduleResolution": "bundler",  // resolves modules correctly
     "jsx": "react-jsx",           // React 18 JSX transform
     "esModuleInterop": true,     // avoids tslib default issues
     "allowSyntheticDefaultImports": true, 

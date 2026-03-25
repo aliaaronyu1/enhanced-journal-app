@@ -182,7 +182,7 @@ export default function HomeScreen() {
             ) : (
               <MotiPressable
                 onPress={() => handleUpdateEntry(item.id)}
-                animate={({ pressed }) => {
+                animate={({ pressed }: { pressed: boolean }) => {
                   "worklet";
                   return {
                     scale: pressed ? 0.96 : 1,
